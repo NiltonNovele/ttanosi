@@ -1,0 +1,1051 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* =========================================================
+     CORE UI — DARK CHROME / MONOCHROME
+     ========================================================= */
+
+  --background: #0d0d0f;
+  --foreground: #f5f5f5;
+
+  --card: #141416;
+  --card-foreground: #f5f5f5;
+
+  --popover: #111113;
+  --popover-foreground: #f5f5f5;
+
+  /* Primary — Chrome / Silver */
+  --primary: #c9c9c9;
+  --primary-foreground: #0d0d0f;
+
+  /* Secondary — Muted Lavender / Grey */
+  --secondary: #8b8593;
+  --secondary-foreground: #ffffff;
+
+  --muted: #1a1a1c;
+  --muted-foreground: #8a8a8e;
+
+  --accent: #2b2b2e;
+  --accent-foreground: #f5f5f5;
+
+  --destructive: #a8442e;
+  --destructive-foreground: #ffffff;
+
+  --border: #2b2b2e;
+  --input: #242426;
+
+  /* Chrome ring */
+  --ring: #c9c9c9;
+
+  --radius: 0.5rem;
+
+  /* =========================================================
+     TYPOGRAPHY
+     ========================================================= */
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space-grotesk);
+
+  /* =========================================================
+     BRAND / VISUAL PALETTE
+     ========================================================= */
+
+  --chrome-black: #0d0d0f;
+  --chrome-dark: #1a1a1a;
+  --chrome-mid-dark: #2b2b2e;
+  --chrome-mid: #4a4a4a;
+  --chrome-grey: #7a7a7a;
+  --chrome-light: #c9c9c9;
+  --chrome-white: #ffffff;
+  --chrome-soft-white: #f5f5f5;
+
+  /* Navy */
+  --navy-deep: #141d33;
+  --navy-black: #0a0e1c;
+  --navy-ink: #1a1a2e;
+
+  /* Warm neutrals */
+  --warm-beige: #d4c9b8;
+  --warm-sand: #d8c9a8;
+  --cream: #e8e0d0;
+  --tan: #c4b59a;
+  --concrete: #9c9184;
+
+  /* Violet */
+  --violet: #6b4c7a;
+  --violet-light: #8a6b96;
+  --violet-muted: #8b8593;
+
+  /* Burnt accent */
+  --burnt-orange: #a8442e;
+
+  /* UI chrome */
+  --ui-background: #0d0d0f;
+  --ui-icons: #8a8a8e;
+  --ui-border: #2b2b2e;
+
+  /* Text */
+  --text-primary: #f5f5f5;
+  --text-secondary: #c9c9c9;
+  --text-muted: #8a8a8e;
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+.dark {
+  --background: #0d0d0f;
+  --foreground: #fafafa;
+
+  --card: #111113;
+  --card-foreground: #fafafa;
+
+  --popover: #0d0d0f;
+  --popover-foreground: #fafafa;
+
+  --primary: #c9c9c9;
+  --primary-foreground: #0d0d0f;
+
+  --secondary: #8b8593;
+  --secondary-foreground: #ffffff;
+
+  --muted: #1a1a1c;
+  --muted-foreground: #8a8a8e;
+
+  --accent: #2b2b2e;
+  --accent-foreground: #fafafa;
+
+  --destructive: #a8442e;
+  --destructive-foreground: #ffffff;
+
+  --border: #2b2b2e;
+  --input: #242426;
+
+  --ring: #c9c9c9;
+}
+
+
+/* =========================================================
+   TAILWIND THEME
+   ========================================================= */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    background: var(--background);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+
+/* =========================================================
+   CHROME / SILVER UTILITIES
+   ========================================================= */
+
+/*
+  Main chrome gradient.
+  Use this for large headings, logos, borders or decorative
+  elements that previously used the yellow accent.
+*/
+
+.chrome-gradient {
+  background: linear-gradient(
+    135deg,
+    #1a1a1a 0%,
+    #ffffff 20%,
+    #4a4a4a 40%,
+    #ffffff 55%,
+    #2b2b2b 70%,
+    #e8e8e8 85%,
+    #0d0d0d 100%
+  );
+}
+
+
+/* Chrome text */
+
+.chrome-text {
+  background: linear-gradient(
+    135deg,
+    #1a1a1a 0%,
+    #ffffff 20%,
+    #4a4a4a 40%,
+    #ffffff 55%,
+    #2b2b2b 70%,
+    #e8e8e8 85%,
+    #0d0d0d 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+/* Softer chrome text */
+
+.chrome-text-soft {
+  background: linear-gradient(
+    110deg,
+    #4a4a4a 0%,
+    #f5f5f5 35%,
+    #7a7a7a 55%,
+    #ffffff 75%,
+    #2b2b2b 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+/* Chrome border */
+
+.chrome-border {
+  border-image: linear-gradient(
+    135deg,
+    #1a1a1a,
+    #ffffff,
+    #4a4a4a,
+    #ffffff,
+    #2b2b2b
+  ) 1;
+}
+
+
+/* =========================================================
+   VIEW TRANSITIONS
+   ========================================================= */
+
+/* Disable default crossfade for view transitions to allow custom animations */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+
+/* =========================================================
+   GLOBE EXPRESS TRAVEL LANDING PAGE
+   ========================================================= */
+
+@layer components {
+  .globe-express {
+    /*
+      Main application chrome.
+      Previously yellow-based — now monochrome chrome.
+    */
+
+    --accent-orange: #c9c9c9;
+    --accent-violet: #8b8593;
+    --accent-warm: #a8442e;
+
+    --text-muted: #ffffffdd;
+
+    background-color: #0d0d0f;
+    color: var(--text-muted);
+
+    position: relative;
+    overflow: hidden;
+
+    font-family: "Inter", sans-serif;
+
+    min-height: 100vh;
+  }
+
+
+  /* =======================================================
+     CARDS
+     ======================================================= */
+
+  .globe-express .card {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    background-position: center;
+    background-size: cover;
+
+    box-shadow:
+      6px 6px 10px 2px rgba(0, 0, 0, 0.6);
+  }
+
+
+  .globe-express .card-content {
+    display: none;
+  }
+
+
+  /* =======================================================
+     CARD CONTENT
+     ======================================================= */
+
+  .globe-express .content-place {
+    margin-top: 6px;
+
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+
+  .globe-express .content-title-1,
+  .globe-express .content-title-2 {
+    font-weight: 600;
+    font-size: 20px;
+
+    font-family: var(--font-oswald), sans-serif;
+  }
+
+
+  .globe-express .content-start {
+    width: 30px;
+    height: 5px;
+
+    border-radius: 99px;
+
+    background-color: #ffffff;
+  }
+
+
+  /* =======================================================
+     HERO DETAILS
+     ======================================================= */
+
+  .globe-express .details {
+    z-index: 22;
+
+    position: absolute;
+
+    top: 240px;
+    left: 60px;
+  }
+
+
+  .globe-express .details .place-box {
+    height: 46px;
+    overflow: hidden;
+  }
+
+
+  .globe-express .details .place-box .text {
+    padding-top: 16px;
+    font-size: 20px;
+  }
+
+
+  .globe-express .details .place-box .text:before {
+    top: 0;
+    left: 0;
+
+    position: absolute;
+
+    content: "";
+
+    width: 30px;
+    height: 4px;
+
+    border-radius: 99px;
+
+    /*
+      Silver instead of yellow.
+    */
+    background: linear-gradient(
+      90deg,
+      #ffffff,
+      #7a7a7a,
+      #ffffff
+    );
+  }
+
+
+  .globe-express .details .title-1,
+  .globe-express .details .title-2 {
+    font-weight: 600;
+    font-size: 72px;
+
+    font-family: var(--font-oswald), sans-serif;
+  }
+
+
+  .globe-express .details .title-box-1,
+  .globe-express .details .title-box-2 {
+    margin-top: 2px;
+
+    height: 100px;
+
+    overflow: hidden;
+  }
+
+
+  @media (max-width: 768px) {
+    .globe-express .details .title-box-1,
+    .globe-express .details .title-box-2 {
+      height: 50px;
+    }
+  }
+
+
+  /* =======================================================
+     DESCRIPTION
+     ======================================================= */
+
+  .globe-express .details > .desc {
+    margin-top: 16px;
+
+    width: 500px;
+    max-width: 90vw;
+
+    text-shadow:
+      0 2px 10px rgba(0, 0, 0, 0.5);
+
+    /*
+      Instead of a yellow translucent panel,
+      use a very subtle chrome/black glass effect.
+    */
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08),
+        rgba(13, 13, 15, 0.35)
+      );
+
+    backdrop-filter: blur(8px);
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    border-left: 2px solid #c9c9c9;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+
+  @media (max-width: 768px) {
+    .globe-express .details > .desc {
+      width: 100%;
+
+      padding: 12px;
+
+      font-size: 13px;
+    }
+  }
+
+
+  /* =======================================================
+     CTA
+     ======================================================= */
+
+  .globe-express .details > .cta > .bookmark {
+    display: none;
+  }
+
+
+  .globe-express .details > .cta > .bookmark svg {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  .globe-express .details > .cta > .discover {
+    border: 1px solid #ffffff;
+
+    background-color: transparent;
+
+    height: 48px;
+
+    border-radius: 99px;
+
+    color: #ffffff;
+
+    padding: 0 40px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease,
+      transform 0.3s ease;
+  }
+
+
+  .globe-express .details > .cta > .discover:hover {
+    /*
+      Chrome hover rather than yellow.
+    */
+
+    background:
+      linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #c9c9c9 35%,
+        #4a4a4a 70%,
+        #ffffff 100%
+      );
+
+    border-color: #ffffff;
+
+    color: #0d0d0f;
+
+    box-shadow:
+      0 0 30px rgba(255, 255, 255, 0.15);
+
+    transform: translateY(-1px);
+  }
+
+
+  /* =======================================================
+     NAVIGATION
+     ======================================================= */
+
+  .globe-express nav {
+    position: fixed;
+
+    left: 0;
+    top: 0;
+    right: 0;
+
+    z-index: 50;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 36px;
+
+    font-weight: 500;
+
+    background: transparent;
+  }
+
+
+  .globe-express nav svg {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  .globe-express nav .svg-container {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  .globe-express nav > div {
+    display: inline-flex;
+
+    align-items: center;
+
+    text-transform: uppercase;
+
+    font-size: 14px;
+  }
+
+
+  .globe-express nav > div:first-child {
+    gap: 10px;
+  }
+
+
+  .globe-express nav > div:last-child {
+    gap: 24px;
+  }
+
+
+  /* =======================================================
+     ACTIVE NAV ITEM
+     ======================================================= */
+
+  .globe-express nav > div:last-child > .active {
+    position: relative;
+  }
+
+
+  .globe-express nav > div:last-child > .active:after {
+    bottom: -8px;
+    left: 0;
+    right: 0;
+
+    position: absolute;
+
+    content: "";
+
+    height: 2px;
+
+    border-radius: 99px;
+
+    /*
+      Chrome active indicator.
+    */
+
+    background: linear-gradient(
+      90deg,
+      #4a4a4a,
+      #ffffff,
+      #7a7a7a
+    );
+
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 0.2);
+  }
+
+
+  /* =======================================================
+     INACTIVE ICONS
+     ======================================================= */
+
+  .globe-express nav svg {
+    color: #8a8a8e;
+
+    transition:
+      color 0.25s ease,
+      opacity 0.25s ease;
+  }
+
+
+  .globe-express nav svg:hover {
+    color: #ffffff;
+  }
+
+
+  /* =======================================================
+     INDICATOR
+     ======================================================= */
+
+  .globe-express .indicator {
+    display: none;
+  }
+
+
+  /* =======================================================
+     PAGINATION
+     ======================================================= */
+
+  .globe-express .pagination {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    display: inline-flex;
+  }
+
+
+  .globe-express .pagination > .arrow {
+    z-index: 60;
+
+    width: 50px;
+    height: 50px;
+
+    border-radius: 999px;
+
+    border: 1px solid rgba(255, 255, 255, 0.33);
+
+    display: grid;
+
+    place-items: center;
+
+    cursor: pointer;
+
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s ease;
+  }
+
+
+  .globe-express .pagination > .arrow:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+
+    border-color: rgba(255, 255, 255, 0.7);
+
+    transform: translateY(-1px);
+  }
+
+
+  .globe-express .pagination > .arrow:nth-child(2) {
+    margin-left: 20px;
+  }
+
+
+  .globe-express .pagination > .arrow svg {
+    width: 24px;
+    height: 24px;
+
+    stroke-width: 2;
+
+    color: #ffffff99;
+
+    transition: color 0.25s ease;
+  }
+
+
+  .globe-express .pagination > .arrow:hover svg {
+    color: #ffffff;
+  }
+
+
+  /* =======================================================
+     PROGRESS BAR
+     ======================================================= */
+
+  .globe-express .pagination .progress-sub-container {
+    margin-left: 24px;
+
+    z-index: 60;
+
+    width: 500px;
+    height: 50px;
+
+    display: flex;
+
+    align-items: center;
+  }
+
+
+  .globe-express .pagination .progress-sub-container .progress-sub-background {
+    width: 500px;
+    height: 2px;
+
+    background-color: #ffffff33;
+  }
+
+
+  .globe-express
+    .pagination
+    .progress-sub-background
+    .progress-sub-foreground {
+    height: 2px;
+
+    /*
+      Chrome progress instead of yellow.
+    */
+
+    background: linear-gradient(
+      90deg,
+      #4a4a4a 0%,
+      #ffffff 45%,
+      #7a7a7a 70%,
+      #ffffff 100%
+    );
+
+    box-shadow:
+      0 0 8px rgba(255, 255, 255, 0.15);
+  }
+
+
+  /* =======================================================
+     SLIDE NUMBERS
+     ======================================================= */
+
+  .globe-express .pagination .slide-numbers {
+    width: 50px;
+    height: 50px;
+
+    overflow: hidden;
+
+    z-index: 60;
+
+    position: relative;
+  }
+
+
+  .globe-express .pagination .slide-numbers .item {
+    width: 50px;
+    height: 50px;
+
+    position: absolute;
+
+    color: white;
+
+    top: 0;
+    left: 0;
+
+    display: grid;
+
+    place-items: center;
+
+    font-size: 32px;
+
+    font-weight: bold;
+  }
+
+
+  /* =======================================================
+     COVER
+     ======================================================= */
+
+  .globe-express .cover {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    /*
+      Keep the cover neutral instead of yellow influenced.
+    */
+
+    background:
+      linear-gradient(
+        135deg,
+        #0d0d0f 0%,
+        #1a1a1a 45%,
+        #2b2b2e 70%,
+        #0d0d0f 100%
+      );
+
+    z-index: 100;
+  }
+
+
+  /* =======================================================
+     SUBTLE BACKGROUND LIGHT
+     ======================================================= */
+
+  .globe-express::before {
+    content: "";
+
+    position: absolute;
+
+    width: 500px;
+    height: 500px;
+
+    top: -250px;
+    right: -150px;
+
+    background:
+      radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.03) 35%,
+        transparent 70%
+      );
+
+    pointer-events: none;
+
+    z-index: 1;
+  }
+
+
+  /* =======================================================
+     CUSTOM ANIMATIONS
+     ======================================================= */
+
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+  }
+
+
+  .animate-pulse-slow {
+    animation: pulse-slow 8s ease-in-out infinite;
+  }
+
+
+  /* =======================================================
+     CHROME SHIMMER
+     ======================================================= */
+
+  @keyframes chrome-shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+
+  .chrome-shimmer {
+    background: linear-gradient(
+      110deg,
+      #1a1a1a,
+      #ffffff,
+      #4a4a4a,
+      #ffffff,
+      #2b2b2b,
+      #f5f5f5,
+      #1a1a1a
+    );
+
+    background-size: 300% 300%;
+
+    animation:
+      chrome-shimmer 8s ease-in-out infinite;
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+
+  /* =======================================================
+     GLASS UI
+     ======================================================= */
+
+  .chrome-glass {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08),
+        rgba(255, 255, 255, 0.025)
+      );
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 12px 40px rgba(0, 0, 0, 0.25);
+  }
+
+
+  /* =======================================================
+     SOFT DIVIDER
+     ======================================================= */
+
+  .chrome-divider {
+    height: 1px;
+
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #4a4a4a,
+      #ffffff,
+      #4a4a4a,
+      transparent
+    );
+
+    opacity: 0.55;
+  }
+
+
+  /* =======================================================
+     SPARKLE / STAR ACCENTS
+     ======================================================= */
+
+  .sparkle {
+    color: #ffffff;
+
+    filter:
+      drop-shadow(0 0 5px rgba(255, 255, 255, 0.25));
+  }
+
+
+  /* =======================================================
+     MOBILE NAV / PAGINATION
+     ======================================================= */
+
+  @media (max-width: 768px) {
+    .globe-express nav {
+      padding: 16px 20px;
+    }
+
+    .globe-express nav > div:last-child {
+      gap: 14px;
+    }
+
+    .globe-express .pagination .progress-sub-container {
+      width: 180px;
+    }
+
+    .globe-express
+      .pagination
+      .progress-sub-container
+      .progress-sub-background {
+      width: 180px;
+    }
+  }
+}
