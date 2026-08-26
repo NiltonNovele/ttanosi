@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   MapPin,
   Lock,
-  ChevronDown,
   ShoppingBag,
   ArrowLeft,
   Mail,
@@ -26,30 +25,31 @@ import {
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
 import Link from "next/link";
+import { Footer } from "@/components/footer";
 
 const paymentMethods = [
   {
     id: "card",
-    title: "Credit / Debit Card",
-    description: "Visa, Mastercard, RuPay & more",
+    title: "Cards",
+    description: "Visa, Mastercard & more",
     icon: CreditCard,
   },
   {
-    id: "upi",
-    title: "UPI",
-    description: "Google Pay, PhonePe, Paytm & more",
+    id: "mpesa",
+    title: "M-Pesa",
+    description: "Pay securely with M-Pesa",
     icon: Smartphone,
   },
   {
-    id: "paypal",
-    title: "PayPal",
-    description: "Pay securely with PayPal",
+    id: "emola",
+    title: "E-Mola",
+    description: "Pay securely with E-Mola",
     icon: Wallet,
   },
   {
-    id: "netbanking",
-    title: "Net Banking",
-    description: "All major Indian banks",
+    id: "mkesh",
+    title: "mKesh",
+    description: "Pay securely with mKesh",
     icon: Building2,
   },
   {
@@ -89,9 +89,6 @@ export default function CheckoutPage() {
     cvc: "",
     name: "",
   });
-
-  const [upiId, setUpiId] = React.useState("");
-  const [selectedBank, setSelectedBank] = React.useState("");
 
   React.useEffect(() => {
     setMounted(true);
@@ -162,9 +159,9 @@ export default function CheckoutPage() {
     }
 
     if (formData.pinCode.length < 4) {
-      toast.error("Invalid PIN Code", {
+      toast.error("Invalid Postal Code", {
         description:
-          "Please enter a valid postal / PIN code.",
+          "Please enter a valid postal code.",
       });
 
       return false;
@@ -184,27 +181,6 @@ export default function CheckoutPage() {
 
         return false;
       }
-    }
-
-    if (selectedPayment === "upi" && !upiId.trim()) {
-      toast.error("UPI ID Required", {
-        description:
-          "Please enter your UPI ID to continue.",
-      });
-
-      return false;
-    }
-
-    if (
-      selectedPayment === "netbanking" &&
-      !selectedBank
-    ) {
-      toast.error("Select Your Bank", {
-        description:
-          "Please select a bank before continuing.",
-      });
-
-      return false;
     }
 
     return true;
@@ -385,7 +361,7 @@ export default function CheckoutPage() {
                     Amount
                   </span>
                   <span className="font-bold text-white">
-                    ₹{total.toLocaleString("en-IN")}
+                    MZN {total.toLocaleString("en-MZ")}
                   </span>
                 </div>
 
@@ -393,10 +369,11 @@ export default function CheckoutPage() {
                   <span className="text-xs uppercase tracking-widest text-zinc-500">
                     Payment
                   </span>
-                  <span className="text-sm font-medium capitalize text-zinc-300">
-                    {selectedPayment === "card"
-                      ? "Credit / Debit Card"
-                      : selectedPayment}
+                  <span className="text-sm font-medium text-zinc-300">
+                    {paymentMethods.find(
+                      (method) =>
+                        method.id === selectedPayment
+                    )?.title || selectedPayment}
                   </span>
                 </div>
               </div>
@@ -597,7 +574,7 @@ export default function CheckoutPage() {
                         name="city"
                         value={formData.city}
                         onChange={handleInputChange}
-                        placeholder="Mumbai"
+                        placeholder="Maputo"
                         autoComplete="address-level2"
                         className={inputClassName}
                       />
@@ -605,7 +582,7 @@ export default function CheckoutPage() {
 
                     <div className="space-y-2">
                       <label className="px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                        State
+                        Province
                       </label>
 
                       <input
@@ -613,7 +590,7 @@ export default function CheckoutPage() {
                         name="state"
                         value={formData.state}
                         onChange={handleInputChange}
-                        placeholder="Maharashtra"
+                        placeholder="Maputo"
                         autoComplete="address-level1"
                         className={inputClassName}
                       />
@@ -621,7 +598,7 @@ export default function CheckoutPage() {
 
                     <div className="col-span-2 space-y-2 md:col-span-1">
                       <label className="px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                        PIN Code
+                        Postal Code
                       </label>
 
                       <input
@@ -629,7 +606,7 @@ export default function CheckoutPage() {
                         name="pinCode"
                         value={formData.pinCode}
                         onChange={handleInputChange}
-                        placeholder="400001"
+                        placeholder="1100"
                         inputMode="numeric"
                         autoComplete="postal-code"
                         className={inputClassName}
@@ -842,65 +819,28 @@ export default function CheckoutPage() {
                                   </div>
                                 )}
 
-                                {/* UPI */}
+                                {/* M-PESA */}
 
-                                {method.id === "upi" && (
-                                  <div className="space-y-4">
-                                    <div className="rounded-xl border border-white/5 bg-black/20 p-4 text-xs leading-relaxed text-zinc-500">
-                                      Enter your UPI ID. You&apos;ll
-                                      receive a payment request in
-                                      your UPI application.
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      <label className="px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                                        UPI ID / VPA
-                                      </label>
-
-                                      <input
-                                        type="text"
-                                        value={upiId}
-                                        onChange={(e) =>
-                                          setUpiId(
-                                            e.target.value
-                                          )
-                                        }
-                                        placeholder="username@upi"
-                                        className={inputClassName}
+                                {method.id === "mpesa" && (
+                                  <div className="py-4 text-center">
+                                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+                                      <Smartphone
+                                        size={23}
+                                        className="text-white/50"
                                       />
                                     </div>
 
-                                    <div className="flex flex-wrap gap-2">
-                                      {[
-                                        "@ybl",
-                                        "@okaxis",
-                                        "@paytm",
-                                        "@ibl",
-                                      ].map((suffix) => (
-                                        <button
-                                          key={suffix}
-                                          type="button"
-                                          onClick={() =>
-                                            setUpiId(
-                                              (current) =>
-                                                current.replace(
-                                                  /@.*$/,
-                                                  ""
-                                                ) + suffix
-                                            )
-                                          }
-                                          className="rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-[9px] font-bold text-zinc-500 transition-colors hover:bg-white/[0.07] hover:text-white"
-                                        >
-                                          {suffix}
-                                        </button>
-                                      ))}
-                                    </div>
+                                    <p className="text-sm text-zinc-400">
+                                      You&apos;ll be securely
+                                      redirected to M-Pesa to
+                                      complete your payment.
+                                    </p>
                                   </div>
                                 )}
 
-                                {/* PAYPAL */}
+                                {/* E-MOLA */}
 
-                                {method.id === "paypal" && (
+                                {method.id === "emola" && (
                                   <div className="py-4 text-center">
                                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
                                       <Wallet
@@ -911,66 +851,28 @@ export default function CheckoutPage() {
 
                                     <p className="text-sm text-zinc-400">
                                       You&apos;ll be securely
-                                      redirected to PayPal to
+                                      redirected to E-Mola to
                                       complete your payment.
                                     </p>
                                   </div>
                                 )}
 
-                                {/* NET BANKING */}
+                                {/* MKESH */}
 
-                                {method.id ===
-                                  "netbanking" && (
-                                  <div className="space-y-4">
-                                    <div className="space-y-2">
-                                      <label className="px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                                        Select Bank
-                                      </label>
-
-                                      <div className="relative">
-                                        <select
-                                          value={selectedBank}
-                                          onChange={(e) =>
-                                            setSelectedBank(
-                                              e.target.value
-                                            )
-                                          }
-                                          className={`${inputClassName} appearance-none pr-10`}
-                                        >
-                                          <option
-                                            value=""
-                                            disabled
-                                          >
-                                            Choose your bank
-                                          </option>
-
-                                          <option value="hdfc">
-                                            HDFC Bank
-                                          </option>
-
-                                          <option value="icici">
-                                            ICICI Bank
-                                          </option>
-
-                                          <option value="sbi">
-                                            State Bank of India
-                                          </option>
-
-                                          <option value="axis">
-                                            Axis Bank
-                                          </option>
-
-                                          <option value="kotak">
-                                            Kotak Mahindra Bank
-                                          </option>
-                                        </select>
-
-                                        <ChevronDown
-                                          size={16}
-                                          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600"
-                                        />
-                                      </div>
+                                {method.id === "mkesh" && (
+                                  <div className="py-4 text-center">
+                                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+                                      <Building2
+                                        size={23}
+                                        className="text-white/50"
+                                      />
                                     </div>
+
+                                    <p className="text-sm text-zinc-400">
+                                      You&apos;ll be securely
+                                      redirected to mKesh to
+                                      complete your payment.
+                                    </p>
                                   </div>
                                 )}
 
@@ -1118,11 +1020,11 @@ export default function CheckoutPage() {
                           </div>
 
                           <p className="text-sm font-bold text-white">
-                            ₹
+                            MZN{" "}
                             {(
                               item.price *
                               item.quantity
-                            ).toLocaleString("en-IN")}
+                            ).toLocaleString("en-MZ")}
                           </p>
                         </div>
                       </div>
@@ -1137,8 +1039,8 @@ export default function CheckoutPage() {
                         </span>
 
                         <span className="font-medium text-zinc-300">
-                          ₹
-                          {subtotal.toLocaleString("en-IN")}
+                          MZN{" "}
+                          {subtotal.toLocaleString("en-MZ")}
                         </span>
                       </div>
 
@@ -1148,8 +1050,8 @@ export default function CheckoutPage() {
                         </span>
 
                         <span className="font-medium text-zinc-300">
-                          ₹
-                          {shipping.toLocaleString("en-IN")}
+                          MZN{" "}
+                          {shipping.toLocaleString("en-MZ")}
                         </span>
                       </div>
 
@@ -1159,8 +1061,8 @@ export default function CheckoutPage() {
                         </span>
 
                         <span className="font-medium text-zinc-300">
-                          ₹
-                          {taxes.toLocaleString("en-IN")}
+                          MZN{" "}
+                          {taxes.toLocaleString("en-MZ")}
                         </span>
                       </div>
                     </div>
@@ -1174,19 +1076,19 @@ export default function CheckoutPage() {
                         </p>
 
                         <p className="mt-1 text-3xl font-black tracking-tighter text-white">
-                          ₹{total.toLocaleString("en-IN")}
+                          MZN {total.toLocaleString("en-MZ")}
                         </p>
                       </div>
 
                       <span className="mb-1 rounded-full border border-white/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-widest text-zinc-600">
-                        INR
+                        MZN
                       </span>
                     </div>
 
                     <button
                       type="submit"
                       disabled={isProcessing}
-                      className="group mt-7 flex w-full items-center justify-center gap-3 rounded-xl bg-white py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-zinc-200 hover:shadow-[0_10px_40px_rgba(255,255,255,0.08)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="group mt-7 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-zinc-200 hover:shadow-[0_10px_40px_rgba(255,255,255,0.08)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:py-4"
                     >
                       {isProcessing ? (
                         <>
@@ -1204,8 +1106,8 @@ export default function CheckoutPage() {
                         </>
                       ) : (
                         <>
-                          Pay ₹
-                          {total.toLocaleString("en-IN")}
+                          Pay MZN{" "}
+                          {total.toLocaleString("en-MZ")}
 
                           <Lock
                             size={15}
@@ -1235,6 +1137,7 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+      
 
       <style
         dangerouslySetInnerHTML={{
@@ -1259,5 +1162,7 @@ export default function CheckoutPage() {
         }}
       />
     </main>
+
+    
   );
 }

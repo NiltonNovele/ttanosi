@@ -282,7 +282,7 @@ export default function ProductDetailPage({
 
               <div className="mt-5 flex items-center gap-4">
                 <span className="text-xl font-bold tracking-tight sm:text-2xl">
-                  ₹{product.price.toLocaleString("en-IN")}
+                  MZN{product.price.toLocaleString("en-IN")}
                 </span>
 
                 <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
@@ -397,7 +397,7 @@ export default function ProductDetailPage({
                   <ShoppingBag className="h-4 w-4" />
 
                   <span>
-                    Add to Cart — ₹
+                    Add to Cart — MZN
                     {(product.price * quantity).toLocaleString("en-IN")}
                   </span>
 
