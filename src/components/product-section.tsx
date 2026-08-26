@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ProductCard } from "./product-card.tsx";
+import { ProductCard } from "./product-card";
 import { getProductsByCategory, Product } from "@/lib/data";
 import Link from "next/link";
 
