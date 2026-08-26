@@ -12,7 +12,7 @@ import {
 const socialLinks = [
   {
     label: "Instagram",
-    href: "https://instagram.com/YOUR_INSTAGRAM",
+    href: "https://www.instagram.com/ttanosi/",
     icon: Instagram,
   },
   {

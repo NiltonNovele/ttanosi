@@ -36,8 +36,70 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Gen Z E-Commerce",
-  description: "A bold, modern e-commerce platform.",
+  title: {
+    default: "Ttanosi — Made for the Movement",
+    template: "%s — Ttanosi",
+  },
+  description:
+    "Ttanosi is a modern streetwear brand built for the movement. Discover limited drops, bold essentials, and pieces designed to stand out.",
+  keywords: [
+    "Ttanosi",
+    "Ttanosi Clothing",
+    "streetwear",
+    "fashion",
+    "urban fashion",
+    "streetwear clothing",
+    "limited drops",
+    "mens fashion",
+    "womens fashion",
+    "accessories",
+  ],
+  authors: [
+    {
+      name: "Ttanosi",
+    },
+  ],
+  creator: "Ttanosi",
+  publisher: "Ttanosi",
+  applicationName: "Ttanosi",
+  generator: "Next.js",
+  metadataBase: new URL("https://ttanosi.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Ttanosi — Made for the Movement",
+    description:
+      "Bold streetwear. Limited drops. Made for the movement.",
+    url: "https://ttanosi.vercel.app",
+    siteName: "Ttanosi",
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Ttanosi — Made for the Movement",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ttanosi — Made for the Movement",
+    description:
+      "Bold streetwear. Limited drops. Made for the movement.",
+    images: ["/logo.jpg"],
+  },
+  icons: {
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
