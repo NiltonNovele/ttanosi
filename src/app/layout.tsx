@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, Montserrat, Roboto, Oswald } from "next/font/google";
+import {
+  Inter,
+  Space_Grotesk,
+  Montserrat,
+  Roboto,
+  Oswald,
+} from "next/font/google";
+
 import "./globals.css";
+
 import { ThemeProvider } from "@/components/theme-provider";
 import { MegaMenu } from "@/components/mega-menu";
 import { CartSidebar } from "@/components/cart-sidebar";
 import { Toaster } from "@/components/toaster";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { Footer } from "@/components/footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,65 +46,84 @@ const oswald = Oswald({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ttanosi — Made for the Movement",
-    template: "%s — Ttanosi",
+    default: "Tanosi — Feito para o Movimento",
+    template: "%s — Tanosi",
   },
+
   description:
-    "Ttanosi is a modern streetwear brand built for the movement. Discover limited drops, bold essentials, and pieces designed to stand out.",
+    "A Tanosi é uma marca de streetwear moderna criada para o movimento. Descobre lançamentos limitados, essenciais marcantes e peças concebidas para se destacarem.",
+
   keywords: [
-    "Ttanosi",
-    "Ttanosi Clothing",
+    "Tanosi",
+    "Tanosi Clothing",
     "streetwear",
-    "fashion",
-    "urban fashion",
-    "streetwear clothing",
-    "limited drops",
-    "mens fashion",
-    "womens fashion",
-    "accessories",
+    "moda",
+    "moda urbana",
+    "roupa streetwear",
+    "lançamentos limitados",
+    "moda masculina",
+    "moda feminina",
+    "acessórios",
   ],
+
   authors: [
     {
-      name: "Ttanosi",
+      name: "Tanosi",
     },
   ],
-  creator: "Ttanosi",
-  publisher: "Ttanosi",
-  applicationName: "Ttanosi",
+
+  creator: "Tanosi",
+  publisher: "Tanosi",
+  applicationName: "Tanosi",
   generator: "Next.js",
-  metadataBase: new URL("https://ttanosi.vercel.app"),
+
+  metadataBase: new URL("https://Tanosi.vercel.app"),
+
   alternates: {
     canonical: "/",
   },
+
   openGraph: {
-    title: "Ttanosi — Made for the Movement",
+    title: "Tanosi — Feito para o Movimento",
+
     description:
-      "Bold streetwear. Limited drops. Made for the movement.",
-    url: "https://ttanosi.vercel.app",
-    siteName: "Ttanosi",
+      "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
+
+    url: "https://Tanosi.vercel.app",
+
+    siteName: "Tanosi",
+
     type: "website",
-    locale: "en_US",
+
+    locale: "pt_PT",
+
     images: [
       {
         url: "/logo.jpg",
         width: 1200,
         height: 630,
-        alt: "Ttanosi — Made for the Movement",
+        alt: "Tanosi — Feito para o Movimento",
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Ttanosi — Made for the Movement",
+
+    title: "Tanosi — Feito para o Movimento",
+
     description:
-      "Bold streetwear. Limited drops. Made for the movement.",
+      "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
+
     images: ["/logo.jpg"],
   },
+
   icons: {
     icon: "/logo.jpg",
     shortcut: "/logo.jpg",
     apple: "/logo.jpg",
   },
+
   robots: {
     index: true,
     follow: true,
@@ -108,9 +136,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-PT" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${roboto.variable} ${oswald.variable} font-sans antialiased selection:bg-primary selection:text-primary-foreground min-h-screen flex flex-col`}
+        className={`
+          ${inter.variable}
+          ${spaceGrotesk.variable}
+          ${montserrat.variable}
+          ${roboto.variable}
+          ${oswald.variable}
+          min-h-screen
+          flex
+          flex-col
+          font-sans
+          antialiased
+          selection:bg-primary
+          selection:text-primary-foreground
+        `}
       >
         <ThemeProvider
           attribute="class"
@@ -120,13 +161,15 @@ export default function RootLayout({
         >
           <SmoothScroll>
             <MegaMenu />
+
             <CartSidebar />
-            <main className="flex-1">
-              {children}
-            </main>
+
+            <main className="flex-1">{children}</main>
+
             <Toaster />
           </SmoothScroll>
         </ThemeProvider>
+        <Footer />
       </body>
     </html>
   );

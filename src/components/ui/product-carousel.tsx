@@ -2,7 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, ShoppingBag } from "lucide-react";
+import {
+  ArrowRight,
+  ShoppingBag,
+} from "lucide-react";
 import { Product } from "@/lib/data";
 import { useCartStore } from "@/store/useCartStore";
 
@@ -17,30 +20,39 @@ export function ProductCarousel({
   products,
   viewAllLink,
 }: ProductCarouselProps) {
-  const addItem = useCartStore((state) => state.addItem);
+  const addItem = useCartStore(
+    (state) => state.addItem,
+  );
 
   return (
-    <section className="py-12 sm:py-16 md:py-20">
+    <section className="relative overflow-hidden py-12 sm:py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* =====================================================
             HEADER
-            ===================================================== */}
+        ===================================================== */}
 
         <div className="mb-7 flex items-end justify-between gap-6 sm:mb-9">
           <div>
             {/* Small label */}
+
             <div className="mb-3 flex items-center gap-2.5">
               <span className="h-px w-6 bg-white/30" />
 
               <span className="text-[8px] font-bold uppercase tracking-[0.3em] text-white/30">
-                Ttanosi / Selection
+                Tanosi / Selecção
               </span>
             </div>
+
+            {/* Heading */}
 
             <h2 className="text-2xl font-black uppercase tracking-[-0.05em] text-foreground sm:text-3xl md:text-5xl">
               {title}
             </h2>
           </div>
+
+          {/* =================================================
+              VIEW ALL
+          ================================================= */}
 
           {viewAllLink && (
             <Link
@@ -62,14 +74,21 @@ export function ProductCarousel({
                 hover:text-foreground
               "
             >
-              <span className="hidden sm:inline">View All</span>
-              <span className="sm:hidden">All</span>
+              <span className="hidden sm:inline">
+                Ver todas
+              </span>
+
+              <span className="sm:hidden">
+                Ver
+              </span>
 
               <motion.span
                 className="flex"
                 initial={{ x: 0 }}
                 whileHover={{ x: 4 }}
-                transition={{ duration: 0.2 }}
+                transition={{
+                  duration: 0.2,
+                }}
               >
                 <ArrowRight
                   className="h-3.5 w-3.5"
@@ -82,7 +101,7 @@ export function ProductCarousel({
 
         {/* =====================================================
             CAROUSEL
-            ===================================================== */}
+        ===================================================== */}
 
         <div
           className="
@@ -111,14 +130,23 @@ export function ProductCarousel({
                 md:w-[320px]
                 lg:w-[340px]
               "
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{
+                opacity: 0,
+                y: 20,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
               viewport={{
                 once: true,
                 margin: "-50px",
               }}
               transition={{
-                delay: Math.min(index * 0.07, 0.35),
+                delay: Math.min(
+                  index * 0.07,
+                  0.35,
+                ),
                 duration: 0.5,
                 ease: [0.22, 1, 0.36, 1],
               }}
@@ -139,12 +167,12 @@ export function ProductCarousel({
               >
                 {/* =================================================
                     IMAGE
-                    ================================================= */}
+                ================================================= */}
 
                 <Link
                   href={`/product/${product.id}`}
                   className="block"
-                  aria-label={`View ${product.name}`}
+                  aria-label={`Ver ${product.name}`}
                 >
                   <div
                     className="
@@ -160,7 +188,12 @@ export function ProductCarousel({
                     <img
                       src={product.images[0]}
                       alt={product.name}
-                      loading={index < 2 ? "eager" : "lazy"}
+                      loading={
+                        index < 2
+                          ? "eager"
+                          : "lazy"
+                      }
+                      draggable={false}
                       className="
                         h-full
                         w-full
@@ -172,7 +205,9 @@ export function ProductCarousel({
                       "
                     />
 
-                    {/* Dark cinematic gradient */}
+                    {/* =================================================
+                        CINEMATIC GRADIENT
+                    ================================================= */}
 
                     <div
                       aria-hidden="true"
@@ -205,9 +240,10 @@ export function ProductCarousel({
 
                     {/* =================================================
                         BADGE
-                        ================================================= */}
+                    ================================================= */}
 
-                    {product.badge || product.isNewArrival ? (
+                    {product.badge ||
+                    product.isNewArrival ? (
                       <div
                         className="
                           absolute
@@ -228,11 +264,14 @@ export function ProductCarousel({
                           backdrop-blur-md
                         "
                       >
-                        {product.badge || "NEW"}
+                        {product.badge ||
+                          "NOVIDADE"}
                       </div>
                     ) : null}
 
-                    {/* Product number */}
+                    {/* =================================================
+                        PRODUCT NUMBER
+                    ================================================= */}
 
                     <div
                       className="
@@ -245,12 +284,15 @@ export function ProductCarousel({
                         text-white/35
                       "
                     >
-                      {String(index + 1).padStart(2, "0")}
+                      {String(index + 1).padStart(
+                        2,
+                        "0",
+                      )}
                     </div>
 
                     {/* =================================================
                         QUICK ADD
-                        ================================================= */}
+                    ================================================= */}
 
                     <div
                       className="
@@ -270,8 +312,12 @@ export function ProductCarousel({
                     >
                       <motion.button
                         type="button"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{
+                          scale: 1.03,
+                        }}
+                        whileTap={{
+                          scale: 0.97,
+                        }}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -281,7 +327,8 @@ export function ProductCarousel({
                             name: product.name,
                             price: product.price,
                             quantity: 1,
-                            image: product.images[0],
+                            image:
+                              product.images[0],
                           });
                         }}
                         className="
@@ -312,7 +359,7 @@ export function ProductCarousel({
                           strokeWidth={1.8}
                         />
 
-                        Quick Add
+                        Adicionar
                       </motion.button>
                     </div>
                   </div>
@@ -320,7 +367,7 @@ export function ProductCarousel({
 
                 {/* =================================================
                     PRODUCT INFORMATION
-                    ================================================= */}
+                ================================================= */}
 
                 <div className="p-4 sm:p-5">
                   <div className="flex items-start justify-between gap-3">
@@ -348,20 +395,35 @@ export function ProductCarousel({
                       </h3>
                     </Link>
 
+                    {/* =================================================
+                        PRICE — MZN
+                    ================================================= */}
+
                     <span className="shrink-0 text-[11px] font-bold text-foreground/65 sm:text-xs">
-                      ₹{product.price.toLocaleString("en-IN")}
+                      {new Intl.NumberFormat(
+                        "pt-MZ",
+                        {
+                          style: "currency",
+                          currency: "MZN",
+                          maximumFractionDigits: 0,
+                        },
+                      ).format(product.price)}
                     </span>
                   </div>
+
+                  {/* Description */}
 
                   <p className="mt-2 line-clamp-2 text-[10px] leading-5 text-foreground/35 sm:text-[11px]">
                     {product.description}
                   </p>
 
-                  {/* Bottom detail */}
+                  {/* =================================================
+                      BOTTOM DETAIL
+                  ================================================= */}
 
                   <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-3">
                     <span className="text-[7px] font-bold uppercase tracking-[0.2em] text-white/20">
-                      Ttanosi
+                      Tanosi
                     </span>
 
                     <Link
@@ -376,7 +438,7 @@ export function ProductCarousel({
                         hover:text-white/70
                       "
                     >
-                      View Piece
+                      Ver peça
                     </Link>
                   </div>
                 </div>
@@ -387,14 +449,14 @@ export function ProductCarousel({
 
         {/* =====================================================
             MOBILE SCROLL INDICATOR
-            ===================================================== */}
+        ===================================================== */}
 
         {products.length > 1 && (
           <div className="mt-1 flex items-center justify-center gap-2 sm:hidden">
             <span className="h-px w-8 bg-white/20" />
 
             <span className="text-[7px] font-bold uppercase tracking-[0.25em] text-white/20">
-              Swipe
+              Desliza
             </span>
 
             <span className="h-px w-8 bg-white/20" />

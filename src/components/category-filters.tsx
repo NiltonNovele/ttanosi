@@ -32,7 +32,7 @@ export function CategoryFilters() {
   return (
     <div className="mt-6 flex items-center justify-end md:mt-0">
       <div className="flex items-center gap-2">
-        {/* Filter indicator */}
+        {/* Indicador de ordenação */}
         <div className="hidden items-center gap-2 text-white/30 sm:flex">
           <SlidersHorizontal
             className="h-3.5 w-3.5"
@@ -40,14 +40,14 @@ export function CategoryFilters() {
           />
 
           <span className="text-[9px] font-bold uppercase tracking-[0.2em]">
-            Sort
+            Ordenar
           </span>
         </div>
 
         {/* Select */}
         <div className="group relative">
           <select
-            aria-label="Sort products"
+            aria-label="Ordenar produtos"
             value={currentSort}
             onChange={handleSortChange}
             className="
@@ -75,13 +75,13 @@ export function CategoryFilters() {
               focus:ring-white/[0.12]
             "
           >
-            <option value="featured">Featured</option>
-            <option value="latest">Latest Drops</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
+            <option value="featured">Em destaque</option>
+            <option value="latest">Lançamentos</option>
+            <option value="price-asc">Preço: menor para maior</option>
+            <option value="price-desc">Preço: maior para menor</option>
           </select>
 
-          {/* Custom arrow */}
+          {/* Seta personalizada */}
           <div
             aria-hidden="true"
             className="
@@ -102,7 +102,7 @@ export function CategoryFilters() {
             />
           </div>
 
-          {/* Subtle chrome highlight */}
+          {/* Brilho subtil */}
           <div
             aria-hidden="true"
             className="

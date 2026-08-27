@@ -9,21 +9,20 @@ import {
   X,
   ArrowUpRight,
 } from "lucide-react";
-import { ThemeToggle } from "./theme-toggle";
 import { useCartStore } from "@/store/useCartStore";
 import { AnimatePresence, motion } from "framer-motion";
 
 const navigation = [
   {
-    label: "MENS",
+    label: "HOMEM",
     href: "/collections/mens",
   },
   {
-    label: "WOMENS",
+    label: "MULHER",
     href: "/collections/womens",
   },
   {
-    label: "TRENDING",
+    label: "TENDÊNCIAS",
     href: "/collections/trending",
   },
   {
@@ -48,15 +47,15 @@ export function MegaMenu() {
     setMounted(true);
   }, []);
 
-  /* Close mobile menu when navigating */
+  /* Fechar o menu mobile ao navegar */
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50 w-full">
+    <header className="fixed inset-x-0 top-0 z-50 w-full">
       {/* =====================================================
-          HEADER
+          CABEÇALHO
           ===================================================== */}
 
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
@@ -79,18 +78,18 @@ export function MegaMenu() {
           "
         >
           {/* =================================================
-              LEFT — MOBILE MENU + LOGO
+              ESQUERDA — MENU MOBILE + LOGÓTIPO
               ================================================= */}
 
           <div className="flex items-center gap-2">
-            {/* Mobile Menu */}
+            {/* Menu Mobile */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
               aria-label={
                 mobileMenuOpen
-                  ? "Close navigation menu"
-                  : "Open navigation menu"
+                  ? "Fechar menu de navegação"
+                  : "Abrir menu de navegação"
               }
               aria-expanded={mobileMenuOpen}
               className="
@@ -135,21 +134,16 @@ export function MegaMenu() {
             </button>
 
             {/* =================================================
-                LOGO
+                LOGÓTIPO
                 ================================================= */}
 
             <Link
               href="/"
               onClick={closeMobileMenu}
               className="group flex items-center gap-2.5"
-              aria-label="Ttanosi home"
+              aria-label="Página inicial da Ttanosi"
             >
-              {/* Logo image */}
-
-              {/* 
-                CHANGE THIS IMAGE:
-                Put your logo at /public/logo.jpg
-              */}
+              {/* Imagem do logótipo */}
 
               <div
                 className="
@@ -165,7 +159,7 @@ export function MegaMenu() {
                 "
               >
                 <Image
-                  src="/logo.jpg"
+                  src="/logo2.png"
                   alt="Ttanosi"
                   fill
                   priority
@@ -178,34 +172,34 @@ export function MegaMenu() {
                   "
                 />
 
-                {/* Chrome overlay */}
+                {/* Sobreposição cromada */}
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/25"
                 />
               </div>
 
-              {/* Wordmark */}
+              {/* Nome da marca */}
 
               <div className="leading-none">
                 <div className="text-base font-black uppercase tracking-[-0.05em] text-white sm:text-lg">
-                  ttanosi
+                  tanosi
                   <span className="chrome-text">.</span>
                 </div>
 
                 <div className="mt-1 text-[6px] font-bold uppercase tracking-[0.38em] text-white/35">
-                  Stay Weird
+                  Fica Diferente
                 </div>
               </div>
             </Link>
           </div>
 
           {/* =================================================
-              DESKTOP NAVIGATION
+              NAVEGAÇÃO DESKTOP
               ================================================= */}
 
           <nav
-            aria-label="Main navigation"
+            aria-label="Navegação principal"
             className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex"
           >
             {navigation.map((item) => (
@@ -228,7 +222,7 @@ export function MegaMenu() {
               >
                 {item.label}
 
-                {/* Active/hover underline */}
+                {/* Sublinhado activo/hover */}
                 <span
                   className="
                     absolute
@@ -250,20 +244,20 @@ export function MegaMenu() {
           </nav>
 
           {/* =================================================
-              RIGHT ACTIONS
+              ACÇÕES À DIREITA
               ================================================= */}
 
           <div className="flex items-center gap-1">
-            <ThemeToggle />
-
-            {/* Cart */}
+            {/* Carrinho */}
             <button
               type="button"
               onClick={toggleCart}
               aria-label={
                 totalItems > 0
-                  ? `Open cart, ${totalItems} items`
-                  : "Open cart"
+                  ? `Abrir carrinho, ${totalItems} ${
+                      totalItems === 1 ? "artigo" : "artigos"
+                    }`
+                  : "Abrir carrinho"
               }
               className="
                 group
@@ -286,7 +280,7 @@ export function MegaMenu() {
                 strokeWidth={1.8}
               />
 
-              {/* Cart count */}
+              {/* Quantidade no carrinho */}
               {mounted && totalItems > 0 && (
                 <span
                   className="
@@ -316,7 +310,7 @@ export function MegaMenu() {
         </div>
 
         {/* =====================================================
-            MOBILE NAVIGATION
+            NAVEGAÇÃO MOBILE
             ===================================================== */}
 
         <AnimatePresence>
@@ -353,7 +347,7 @@ export function MegaMenu() {
               "
             >
               <nav
-                aria-label="Mobile navigation"
+                aria-label="Navegação mobile"
                 className="p-2"
               >
                 {navigation.map((item, index) => (
@@ -415,15 +409,15 @@ export function MegaMenu() {
                 ))}
               </nav>
 
-              {/* Mobile menu footer */}
+              {/* Rodapé do menu mobile */}
               <div className="border-t border-white/[0.06] px-4 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-white/20">
-                    TTANOSI
+                    TANOSI
                   </span>
 
                   <span className="text-[8px] uppercase tracking-[0.2em] text-white/20">
-                    Stay Weird ✦
+                    Fica Diferente ✦
                   </span>
                 </div>
               </div>

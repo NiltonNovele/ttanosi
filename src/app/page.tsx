@@ -5,7 +5,6 @@ import { GlobeHero } from "@/components/landing/GlobeHero";
 import { ProductSection } from "@/components/product-section";
 import { MovementMarquee } from "@/components/movement-marquee";
 import { CategoryShowcase } from "@/components/category-showcase";
-import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -18,7 +17,6 @@ export default function Home() {
       />
       <CategoryShowcase />
       <MovementMarquee />
-      <Footer />
     </div>
   );
 }

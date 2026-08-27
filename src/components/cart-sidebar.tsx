@@ -24,10 +24,24 @@ export function CartSidebar() {
 
   const total = items.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
 
-  // Close on Escape key
+  const totalItems = items.reduce(
+    (acc, item) => acc + item.quantity,
+    0,
+  );
+
+  const formatPrice = (price: number) =>
+  `MZN ${price.toLocaleString("pt-MZ", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })}`;
+
+  /* =========================================================
+      ESCAPE KEY
+  ========================================================== */
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -36,23 +50,35 @@ export function CartSidebar() {
     };
 
     if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener(
+        "keydown",
+        handleKeyDown,
+      );
     }
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
     };
   }, [isOpen, closeCart]);
 
-  // Prevent background scrolling while cart is open
+  /* =========================================================
+      PREVENT BACKGROUND SCROLL
+  ========================================================== */
+
   React.useEffect(() => {
     if (!isOpen) return;
 
-    const originalOverflow = document.body.style.overflow;
+    const originalOverflow =
+      document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow =
+        originalOverflow;
     };
   }, [isOpen]);
 
@@ -62,7 +88,7 @@ export function CartSidebar() {
         <>
           {/* =====================================================
               BACKDROP
-              ===================================================== */}
+          ===================================================== */}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -82,7 +108,7 @@ export function CartSidebar() {
 
           {/* =====================================================
               SIDEBAR
-              ===================================================== */}
+          ===================================================== */}
 
           <motion.aside
             initial={{ x: "100%" }}
@@ -96,7 +122,7 @@ export function CartSidebar() {
             }}
             role="dialog"
             aria-modal="true"
-            aria-label="Shopping cart"
+            aria-label="Carrinho de compras"
             className="
               fixed
               inset-y-0
@@ -115,12 +141,33 @@ export function CartSidebar() {
           >
             {/* =================================================
                 HEADER
-                ================================================= */}
+            ================================================= */}
 
-            <div className="shrink-0 border-b border-white/[0.08] px-5 py-5 sm:px-6">
+            <div
+              className="
+                shrink-0
+                border-b
+                border-white/[0.08]
+                px-5
+                py-5
+                sm:px-6
+              "
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.03]">
+                  <div
+                    className="
+                      flex
+                      h-8
+                      w-8
+                      items-center
+                      justify-center
+                      rounded-full
+                      border
+                      border-white/[0.12]
+                      bg-white/[0.03]
+                    "
+                  >
                     <ShoppingBag
                       className="h-3.5 w-3.5 text-white/60"
                       strokeWidth={1.7}
@@ -128,16 +175,33 @@ export function CartSidebar() {
                   </div>
 
                   <div>
-                    <h2 className="text-sm font-black uppercase tracking-[0.08em] text-white">
-                      Cart
+                    <h2
+                      className="
+                        text-sm
+                        font-black
+                        uppercase
+                        tracking-[0.08em]
+                        text-white
+                      "
+                    >
+                      Carrinho
                     </h2>
 
-                    <p className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.22em] text-white/25">
-                      {items.length === 0
-                        ? "No items"
-                        : `${items.length} ${
-                            items.length === 1 ? "item" : "items"
-                          }`}
+                    <p
+                      className="
+                        mt-0.5
+                        text-[8px]
+                        font-bold
+                        uppercase
+                        tracking-[0.22em]
+                        text-white/25
+                      "
+                    >
+                      {totalItems === 0
+                        ? "Sem artigos"
+                        : totalItems === 1
+                          ? "1 artigo"
+                          : `${totalItems} artigos`}
                     </p>
                   </div>
                 </div>
@@ -145,7 +209,7 @@ export function CartSidebar() {
                 <button
                   type="button"
                   onClick={closeCart}
-                  aria-label="Close cart"
+                  aria-label="Fechar carrinho"
                   className="
                     group
                     flex
@@ -162,10 +226,17 @@ export function CartSidebar() {
                     hover:border-white/20
                     hover:bg-white/[0.05]
                     hover:text-white
+                    active:scale-95
                   "
                 >
                   <X
-                    className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90"
+                    className="
+                      h-4
+                      w-4
+                      transition-transform
+                      duration-300
+                      group-hover:rotate-90
+                    "
                     strokeWidth={1.7}
                   />
                 </button>
@@ -174,19 +245,46 @@ export function CartSidebar() {
 
             {/* =================================================
                 CART CONTENT
-                ================================================= */}
+            ================================================= */}
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 sm:px-6">
+            <div
+              className="
+                min-h-0
+                flex-1
+                overflow-y-auto
+                overscroll-contain
+                px-5
+                sm:px-6
+              "
+            >
               {items.length === 0 ? (
                 /* =================================================
                     EMPTY CART
-                    ================================================= */
+                ================================================= */
 
-                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                <div
+                  className="
+                    flex
+                    h-full
+                    flex-col
+                    items-center
+                    justify-center
+                    px-4
+                    text-center
+                  "
+                >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4 }}
+                    initial={{
+                      opacity: 0,
+                      scale: 0.8,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                    }}
+                    transition={{
+                      duration: 0.4,
+                    }}
                     className="
                       flex
                       h-20
@@ -200,31 +298,72 @@ export function CartSidebar() {
                     "
                   >
                     <ShoppingBag
-                      className="h-7 w-7 text-white/20"
+                      className="
+                        h-7
+                        w-7
+                        text-white/20
+                      "
                       strokeWidth={1.2}
                     />
                   </motion.div>
 
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1, duration: 0.4 }}
+                    initial={{
+                      opacity: 0,
+                      y: 10,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      delay: 0.1,
+                      duration: 0.4,
+                    }}
                     className="mt-6"
                   >
-                    <p className="text-sm font-black uppercase tracking-[0.08em] text-white/80">
-                      Your cart is empty
+                    <p
+                      className="
+                        text-sm
+                        font-black
+                        uppercase
+                        tracking-[0.08em]
+                        text-white/80
+                      "
+                    >
+                      O teu carrinho está vazio
                     </p>
 
-                    <p className="mx-auto mt-2 max-w-[250px] text-xs leading-5 text-white/30">
-                      Nothing weird in here yet. Find something that feels
-                      like you.
+                    <p
+                      className="
+                        mx-auto
+                        mt-2
+                        max-w-[250px]
+                        text-xs
+                        leading-5
+                        text-white/30
+                      "
+                    >
+                      Ainda não tens nenhuma
+                      peça no carrinho. Explora
+                      a Tanosi e encontra algo
+                      que seja a tua cara.
                     </p>
                   </motion.div>
 
                   <motion.button
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
+                    initial={{
+                      opacity: 0,
+                      y: 10,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      delay: 0.2,
+                      duration: 0.4,
+                    }}
                     type="button"
                     onClick={closeCart}
                     className="
@@ -247,9 +386,11 @@ export function CartSidebar() {
                       duration-300
                       hover:bg-white/90
                       hover:tracking-[0.25em]
+                      active:scale-95
                     "
                   >
-                    Start Shopping
+                    Explorar peças
+
                     <ArrowRight
                       className="h-3 w-3"
                       strokeWidth={2}
@@ -259,14 +400,30 @@ export function CartSidebar() {
               ) : (
                 /* =================================================
                     CART ITEMS
-                    ================================================= */
+                ================================================= */
 
-                <ul className="divide-y divide-white/[0.07]">
+                <ul
+                  className="
+                    divide-y
+                    divide-white/[0.07]
+                  "
+                >
                   {items.map((item, index) => (
                     <motion.li
                       key={item.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      initial={{
+                        opacity: 0,
+                        x: 20,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        x: 30,
+                        height: 0,
+                      }}
                       transition={{
                         delay: index * 0.04,
                         duration: 0.3,
@@ -274,7 +431,9 @@ export function CartSidebar() {
                       className="py-5"
                     >
                       <div className="flex gap-4">
-                        {/* Product image */}
+                        {/* =================================================
+                            PRODUCT IMAGE
+                        ================================================= */}
 
                         <div
                           className="
@@ -307,14 +466,29 @@ export function CartSidebar() {
                               "
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <span className="text-[7px] font-bold uppercase tracking-[0.15em] text-white/20">
-                                No Image
+                            <div
+                              className="
+                                flex
+                                h-full
+                                w-full
+                                items-center
+                                justify-center
+                              "
+                            >
+                              <span
+                                className="
+                                  text-[7px]
+                                  font-bold
+                                  uppercase
+                                  tracking-[0.15em]
+                                  text-white/20
+                                "
+                              >
+                                Sem imagem
                               </span>
                             </div>
                           )}
 
-                          {/* Image highlight */}
                           <div
                             aria-hidden="true"
                             className="
@@ -329,22 +503,68 @@ export function CartSidebar() {
                           />
                         </div>
 
-                        {/* Product details */}
+                        {/* =================================================
+                            PRODUCT DETAILS
+                        ================================================= */}
 
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="min-w-0 truncate text-[11px] font-black uppercase tracking-[0.06em] text-white/80">
+                        <div
+                          className="
+                            flex
+                            min-w-0
+                            flex-1
+                            flex-col
+                          "
+                        >
+                          <div
+                            className="
+                              flex
+                              items-start
+                              justify-between
+                              gap-3
+                            "
+                          >
+                            <h3
+                              className="
+                                min-w-0
+                                truncate
+                                text-[11px]
+                                font-black
+                                uppercase
+                                tracking-[0.06em]
+                                text-white/80
+                              "
+                            >
                               {item.name}
                             </h3>
 
-                            <p className="shrink-0 text-[11px] font-bold text-white/70">
-                              ₹{item.price.toFixed(2)}
+                            <p
+                              className="
+                                shrink-0
+                                text-[11px]
+                                font-bold
+                                text-white/70
+                              "
+                            >
+                              {formatPrice(
+                                item.price,
+                              )}
                             </p>
                           </div>
 
-                          {/* Quantity */}
+                          {/* =================================================
+                              QUANTITY
+                          ================================================= */}
 
-                          <div className="mt-auto flex items-end justify-between pt-5">
+                          <div
+                            className="
+                              mt-auto
+                              flex
+                              items-end
+                              justify-between
+                              gap-3
+                              pt-5
+                            "
+                          >
                             <div
                               className="
                                 flex
@@ -361,10 +581,11 @@ export function CartSidebar() {
                                 onClick={() =>
                                   updateQuantity(
                                     item.id,
-                                    item.quantity - 1
+                                    item.quantity -
+                                      1,
                                   )
                                 }
-                                aria-label={`Decrease quantity of ${item.name}`}
+                                aria-label={`Diminuir quantidade de ${item.name}`}
                                 className="
                                   flex
                                   h-full
@@ -375,6 +596,7 @@ export function CartSidebar() {
                                   transition-colors
                                   hover:bg-white/[0.05]
                                   hover:text-white
+                                  active:bg-white/[0.08]
                                 "
                               >
                                 <Minus
@@ -383,7 +605,15 @@ export function CartSidebar() {
                                 />
                               </button>
 
-                              <span className="min-w-8 text-center text-[10px] font-bold text-white/70">
+                              <span
+                                className="
+                                  min-w-8
+                                  text-center
+                                  text-[10px]
+                                  font-bold
+                                  text-white/70
+                                "
+                              >
                                 {item.quantity}
                               </span>
 
@@ -392,10 +622,11 @@ export function CartSidebar() {
                                 onClick={() =>
                                   updateQuantity(
                                     item.id,
-                                    item.quantity + 1
+                                    item.quantity +
+                                      1,
                                   )
                                 }
-                                aria-label={`Increase quantity of ${item.name}`}
+                                aria-label={`Aumentar quantidade de ${item.name}`}
                                 className="
                                   flex
                                   h-full
@@ -406,6 +637,7 @@ export function CartSidebar() {
                                   transition-colors
                                   hover:bg-white/[0.05]
                                   hover:text-white
+                                  active:bg-white/[0.08]
                                 "
                               >
                                 <Plus
@@ -415,9 +647,13 @@ export function CartSidebar() {
                               </button>
                             </div>
 
+                            {/* Remove */}
+
                             <button
                               type="button"
-                              onClick={() => removeItem(item.id)}
+                              onClick={() =>
+                                removeItem(item.id)
+                              }
                               className="
                                 group
                                 inline-flex
@@ -430,14 +666,21 @@ export function CartSidebar() {
                                 text-white/25
                                 transition-colors
                                 hover:text-white/70
+                                active:text-white
                               "
                             >
                               <Trash2
-                                className="h-3 w-3 transition-transform duration-300 group-hover:scale-110"
+                                className="
+                                  h-3
+                                  w-3
+                                  transition-transform
+                                  duration-300
+                                  group-hover:scale-110
+                                "
                                 strokeWidth={1.6}
                               />
 
-                              Remove
+                              Remover
                             </button>
                           </div>
                         </div>
@@ -450,29 +693,73 @@ export function CartSidebar() {
 
             {/* =================================================
                 FOOTER / CHECKOUT
-                ================================================= */}
+            ================================================= */}
 
             {items.length > 0 && (
-              <div className="shrink-0 border-t border-white/[0.08] bg-[#0d0d0f] px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
-                {/* Subtotal */}
+              <div
+                className="
+                  shrink-0
+                  border-t
+                  border-white/[0.08]
+                  bg-[#0d0d0f]
+                  px-5
+                  pb-5
+                  pt-5
+                  sm:px-6
+                  sm:pb-6
+                "
+              >
+                {/* =================================================
+                    TOTAL
+                ================================================= */}
 
-                <div className="mb-4 flex items-end justify-between">
+                <div
+                  className="
+                    mb-4
+                    flex
+                    items-end
+                    justify-between
+                  "
+                >
                   <div>
-                    <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-white/25">
+                    <span
+                      className="
+                        text-[8px]
+                        font-bold
+                        uppercase
+                        tracking-[0.25em]
+                        text-white/25
+                      "
+                    >
                       Subtotal
                     </span>
 
-                    <p className="mt-1 text-[9px] text-white/20">
-                      Shipping calculated at checkout
+                    <p
+                      className="
+                        mt-1
+                        text-[9px]
+                        text-white/20
+                      "
+                    >
+                      Portes calculados no checkout
                     </p>
                   </div>
 
-                  <span className="text-lg font-black tracking-[-0.03em] text-white">
-                    ₹{total.toFixed(2)}
+                  <span
+                    className="
+                      text-lg
+                      font-black
+                      tracking-[-0.03em]
+                      text-white
+                    "
+                  >
+                    {formatPrice(total)}
                   </span>
                 </div>
 
-                {/* Checkout */}
+                {/* =================================================
+                    CHECKOUT
+                ================================================= */}
 
                 <Link
                   href="/checkout"
@@ -495,9 +782,10 @@ export function CartSidebar() {
                     transition-all
                     duration-300
                     hover:bg-[#e8e8e8]
+                    active:scale-[0.99]
                   "
                 >
-                  Checkout
+                  Finalizar compra
 
                   <ArrowRight
                     className="
@@ -511,7 +799,9 @@ export function CartSidebar() {
                   />
                 </Link>
 
-                {/* Continue shopping */}
+                {/* =================================================
+                    CONTINUE SHOPPING
+                ================================================= */}
 
                 <button
                   type="button"
@@ -531,8 +821,11 @@ export function CartSidebar() {
                     hover:text-white/60
                   "
                 >
-                  Continue Shopping
-                  <span className="ml-2">→</span>
+                  Continuar a comprar
+
+                  <span className="ml-2">
+                    →
+                  </span>
                 </button>
               </div>
             )}
