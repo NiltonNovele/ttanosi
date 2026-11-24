@@ -1,8 +1,10 @@
+
 "use client";
 
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   ShoppingBag,
   Menu,
@@ -14,15 +16,11 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const navigation = [
   {
-    label: "HOMEM",
-    href: "/collections/mens",
+    label: "Home",
+    href: "/",
   },
   {
-    label: "MULHER",
-    href: "/collections/womens",
-  },
-  {
-    label: "TENDÊNCIAS",
+    label: "Accessories",
     href: "/collections/trending",
   },
   {
@@ -34,6 +32,8 @@ const navigation = [
 export function MegaMenu() {
   const [mounted, setMounted] = React.useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  const pathname = usePathname();
 
   const cartItems = useCartStore((state) => state.items);
   const toggleCart = useCartStore((state) => state.toggleCart);
@@ -47,42 +47,43 @@ export function MegaMenu() {
     setMounted(true);
   }, []);
 
-  /* Fechar o menu mobile ao navegar */
+  React.useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
 
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 w-full">
-      {/* =====================================================
-          CABEÇALHO
-          ===================================================== */}
-
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <div
+
+        {/* MAIN NAVBAR */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="
-            relative
-            flex
-            h-14
-            items-center
-            justify-between
-            rounded-xl
-            border
-            border-white/[0.08]
-            bg-[#0d0d0f]/50
-            px-3
-            backdrop-blur-xl
-            transition-all
-            duration-300
-            sm:px-4
+            relative flex h-16 items-center justify-between
+            rounded-2xl border border-black/[0.07]
+            bg-white/95 px-3
+            shadow-[0_4px_30px_rgba(0,0,0,0.045)]
+            backdrop-blur-2xl
+            transition-all duration-300
+            sm:px-5
           "
         >
-          {/* =================================================
-              ESQUERDA — MENU MOBILE + LOGÓTIPO
-              ================================================= */}
 
+          {/* LEFT: MOBILE MENU + LOGO */}
           <div className="flex items-center gap-2">
-            {/* Menu Mobile */}
+
+            {/* MOBILE MENU BUTTON */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((open) => !open)}
@@ -93,18 +94,12 @@ export function MegaMenu() {
               }
               aria-expanded={mobileMenuOpen}
               className="
-                group
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-md
-                text-white/55
-                transition-all
-                duration-300
-                hover:bg-white/[0.06]
-                hover:text-white
+                flex h-10 w-10 items-center justify-center
+                rounded-xl text-black/65
+                transition-all duration-300
+                hover:bg-black/[0.05] hover:text-black
+                focus-visible:outline-none
+                focus-visible:ring-2 focus-visible:ring-black/20
                 md:hidden
               "
             >
@@ -117,7 +112,7 @@ export function MegaMenu() {
                     exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <X className="h-5 w-5" strokeWidth={1.8} />
+                    <X className="h-5 w-5" strokeWidth={1.7} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -127,128 +122,109 @@ export function MegaMenu() {
                     exit={{ opacity: 0, rotate: -90, scale: 0.7 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <Menu className="h-5 w-5" strokeWidth={1.8} />
+                    <Menu className="h-5 w-5" strokeWidth={1.7} />
                   </motion.div>
                 )}
               </AnimatePresence>
             </button>
 
-            {/* =================================================
-                LOGÓTIPO
-                ================================================= */}
-
+            {/* BRAND LOGO */}
             <Link
               href="/"
               onClick={closeMobileMenu}
               className="group flex items-center gap-2.5"
               aria-label="Página inicial da Ttanosi"
             >
-              {/* Imagem do logótipo */}
-
-              <div
-                className="
-                  relative
-                  h-9
-                  w-12
-                  shrink-0
-                  overflow-hidden
-                  rounded-sm
-                  bg-white/[0.03]
-                  transition-all
-                  duration-300
-                "
-              >
+              <div className="
+                relative h-10 w-12 shrink-0
+                overflow-hidden rounded-lg bg-gray-50
+                transition-all duration-300
+                group-hover:scale-[1.03]
+              ">
                 <Image
-                  src="/logo2.png"
+                  src="/logo.png"
                   alt="Ttanosi"
                   fill
                   priority
                   sizes="48px"
                   className="
                     object-cover
-                    transition-transform
-                    duration-500
+                    transition-transform duration-500
                     group-hover:scale-105
                   "
                 />
-
-                {/* Sobreposição cromada */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/25"
-                />
               </div>
 
-              {/* Nome da marca */}
-
+              {/* BRAND NAME */}
               <div className="leading-none">
-                <div className="text-base font-black uppercase tracking-[-0.05em] text-white sm:text-lg">
+                <div className="
+                  text-lg font-black uppercase
+                  tracking-[-0.06em] text-black
+                  sm:text-xl
+                ">
                   tanosi
-                  <span className="chrome-text">.</span>
+                  <span className="text-black/35">.</span>
                 </div>
 
-                <div className="mt-1 text-[6px] font-bold uppercase tracking-[0.38em] text-white/35">
+                <div className="
+                  mt-1 text-[7px] font-bold uppercase
+                  tracking-[0.32em] text-black/40
+                ">
                   Fica Diferente
                 </div>
               </div>
             </Link>
           </div>
 
-          {/* =================================================
-              NAVEGAÇÃO DESKTOP
-              ================================================= */}
-
+          {/* DESKTOP NAVIGATION */}
           <nav
             aria-label="Navegação principal"
-            className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex"
+            className="
+              absolute left-1/2 hidden -translate-x-1/2
+              items-center gap-8 md:flex
+            "
           >
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="
-                  group
-                  relative
-                  py-2
-                  text-[10px]
-                  font-bold
-                  uppercase
-                  tracking-[0.16em]
-                  text-white/45
-                  transition-colors
-                  duration-300
-                  hover:text-white
-                "
-              >
-                {item.label}
+            {navigation.map((item) => {
+              const active = isActive(item.href);
 
-                {/* Sublinhado activo/hover */}
-                <span
-                  className="
-                    absolute
-                    -bottom-0.5
-                    left-0
-                    h-px
-                    w-0
-                    bg-gradient-to-r
-                    from-white/30
-                    via-white
-                    to-white/30
-                    transition-all
-                    duration-300
-                    group-hover:w-full
-                  "
-                />
-              </Link>
-            ))}
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`
+                    group relative py-3
+                    text-[10px] font-bold uppercase
+                    tracking-[0.17em]
+                    transition-colors duration-300
+                    ${
+                      active
+                        ? "text-black"
+                        : "text-black/45 hover:text-black"
+                    }
+                  `}
+                >
+                  {item.label}
+
+                  <span
+                    className={`
+                      absolute -bottom-0.5 left-0 h-[1.5px]
+                      bg-black transition-all duration-300
+                      ${
+                        active
+                          ? "w-full"
+                          : "w-0 group-hover:w-full"
+                      }
+                    `}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* =================================================
-              ACÇÕES À DIREITA
-              ================================================= */}
-
+          {/* RIGHT: SHOPPING CART */}
           <div className="flex items-center gap-1">
-            {/* Carrinho */}
+
             <button
               type="button"
               onClick={toggleCart}
@@ -260,59 +236,42 @@ export function MegaMenu() {
                   : "Abrir carrinho"
               }
               className="
-                group
-                relative
-                flex
-                h-9
-                w-9
-                items-center
-                justify-center
-                rounded-md
-                text-white/50
-                transition-all
-                duration-300
-                hover:bg-white/[0.06]
-                hover:text-white
+                group relative flex h-10 w-10
+                items-center justify-center
+                rounded-xl text-black/65
+                transition-all duration-300
+                hover:bg-black/[0.05] hover:text-black
+                focus-visible:outline-none
+                focus-visible:ring-2 focus-visible:ring-black/20
               "
             >
               <ShoppingBag
-                className="h-[17px] w-[17px] transition-transform duration-300 group-hover:scale-105"
-                strokeWidth={1.8}
+                className="
+                  h-[19px] w-[19px]
+                  transition-transform duration-300
+                  group-hover:scale-110
+                "
+                strokeWidth={1.7}
               />
 
-              {/* Quantidade no carrinho */}
+              {/* CART COUNTER */}
               {mounted && totalItems > 0 && (
-                <span
-                  className="
-                    absolute
-                    -right-0.5
-                    -top-0.5
-                    flex
-                    h-4
-                    min-w-4
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-[#0d0d0f]
-                    bg-[#c9c9c9]
-                    px-1
-                    text-[8px]
-                    font-black
-                    text-[#0d0d0f]
-                  "
-                >
+                <span className="
+                  absolute -right-0.5 -top-0.5
+                  flex h-[17px] min-w-[17px]
+                  items-center justify-center
+                  rounded-full border-2 border-white
+                  bg-black px-1
+                  text-[8px] font-bold text-white
+                ">
                   {totalItems > 99 ? "99+" : totalItems}
                 </span>
               )}
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        {/* =====================================================
-            NAVEGAÇÃO MOBILE
-            ===================================================== */}
-
+        {/* MOBILE NAVIGATION */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -332,91 +291,116 @@ export function MegaMenu() {
                 y: -8,
               }}
               transition={{
-                duration: 0.25,
+                duration: 0.3,
                 ease: [0.22, 1, 0.36, 1],
               }}
               className="
-                mt-2
-                overflow-hidden
-                rounded-xl
-                border
-                border-white/[0.08]
-                bg-[#0d0d0f]/95
-                backdrop-blur-xl
-                md:hidden
+                mt-2 overflow-hidden rounded-2xl
+                border border-black/[0.07]
+                bg-white shadow-[0_10px_40px_rgba(0,0,0,0.07)]
+                backdrop-blur-xl md:hidden
               "
             >
               <nav
                 aria-label="Navegação mobile"
                 className="p-2"
               >
-                {navigation.map((item, index) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{
-                      opacity: 0,
-                      x: -10,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    transition={{
-                      delay: index * 0.04,
-                      duration: 0.2,
-                    }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={closeMobileMenu}
-                      className="
-                        group
-                        flex
-                        items-center
-                        justify-between
-                        rounded-lg
-                        px-3
-                        py-3.5
-                        transition-colors
-                        duration-200
-                        hover:bg-white/[0.05]
-                      "
+                {navigation.map((item, index) => {
+                  const active = isActive(item.href);
+
+                  return (
+                    <motion.div
+                      key={item.href}
+                      initial={{
+                        opacity: 0,
+                        x: -10,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      transition={{
+                        delay: index * 0.05,
+                        duration: 0.25,
+                      }}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="font-mono text-[8px] text-white/20">
-                          0{index + 1}
-                        </span>
+                      <Link
+                        href={item.href}
+                        onClick={closeMobileMenu}
+                        aria-current={active ? "page" : undefined}
+                        className={`
+                          group flex items-center
+                          justify-between rounded-xl
+                          px-4 py-4
+                          transition-all duration-200
+                          ${
+                            active
+                              ? "bg-black/[0.045]"
+                              : "hover:bg-black/[0.035]"
+                          }
+                        `}
+                      >
+                        <div className="flex items-center gap-4">
 
-                        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/55 transition-colors group-hover:text-white">
-                          {item.label}
-                        </span>
-                      </div>
+                          <span className={`
+                            font-mono text-[9px]
+                            ${
+                              active
+                                ? "text-black/60"
+                                : "text-black/25"
+                            }
+                          `}>
+                            0{index + 1}
+                          </span>
 
-                      <ArrowUpRight
-                        className="
-                          h-3.5
-                          w-3.5
-                          text-white/20
-                          transition-all
-                          duration-300
-                          group-hover:-translate-y-0.5
-                          group-hover:translate-x-0.5
-                          group-hover:text-white
-                        "
-                      />
-                    </Link>
-                  </motion.div>
-                ))}
+                          <span className={`
+                            text-[11px] font-bold uppercase
+                            tracking-[0.16em]
+                            transition-colors duration-200
+                            ${
+                              active
+                                ? "text-black"
+                                : "text-black/55 group-hover:text-black"
+                            }
+                          `}>
+                            {item.label}
+                          </span>
+                        </div>
+
+                        <ArrowUpRight
+                          className={`
+                            h-4 w-4 transition-all duration-300
+                            ${
+                              active
+                                ? "text-black"
+                                : "text-black/25 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black"
+                            }
+                          `}
+                        />
+                      </Link>
+                    </motion.div>
+                  );
+                })}
               </nav>
 
-              {/* Rodapé do menu mobile */}
-              <div className="border-t border-white/[0.06] px-4 py-3">
+              {/* MOBILE MENU FOOTER */}
+              <div className="
+                border-t border-black/[0.06]
+                px-5 py-4
+              ">
                 <div className="flex items-center justify-between">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-white/20">
+
+                  <span className="
+                    text-[8px] font-bold uppercase
+                    tracking-[0.25em] text-black/40
+                  ">
                     TANOSI
                   </span>
 
-                  <span className="text-[8px] uppercase tracking-[0.2em] text-white/20">
+                  <span className="
+                    text-[8px] uppercase
+                    tracking-[0.2em] text-black/35
+                  ">
                     Fica Diferente ✦
                   </span>
                 </div>
@@ -424,6 +408,7 @@ export function MegaMenu() {
             </motion.div>
           )}
         </AnimatePresence>
+
       </div>
     </header>
   );

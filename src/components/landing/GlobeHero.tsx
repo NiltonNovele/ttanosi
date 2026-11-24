@@ -1,20 +1,14 @@
+
 "use client";
 
 import * as React from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import Link from "next/link";
 import {
-  ArrowDownRight,
   ArrowRight,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
-import Link from "next/link";
-
-/* =========================================================
-   TANOSI ARCHIVE
-   Apenas: T-shirts · Gorros · Bonés Fitted
-========================================================= */
 
 const DATA = [
   {
@@ -118,918 +112,73 @@ const DATA = [
   },
 ];
 
-export function GlobeHero() {
-  const containerRef = React.useRef<HTMLDivElement>(null);
+const FIRST_PHASE_LIMIT = 30;
 
-  const activeRef = React.useRef(0);
-  const animatingRef = React.useRef(false);
-  const pausedRef = React.useRef(false);
+interface GlobeHeroProps {
+  purchasesCount?: number;
+}
 
-  const autoplayRef =
-    React.useRef<ReturnType<typeof setTimeout> | null>(null);
+export function GlobeHero({
+  purchasesCount = 13,
+}: GlobeHeroProps) {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [isPaused, setIsPaused] = React.useState(false);
 
   const touchStartX = React.useRef<number | null>(null);
   const touchStartY = React.useRef<number | null>(null);
 
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const [isPaused, setIsPaused] = React.useState(false);
-
-  const activeData = DATA[activeIndex];
-
-  React.useEffect(() => {
-    pausedRef.current = isPaused;
-  }, [isPaused]);
-
-  useGSAP(
-    () => {
-      if (!containerRef.current) return;
-
-      const container = containerRef.current;
-
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      /* =====================================================
-         LAYOUT
-      ===================================================== */
-
-      const getLayout = () => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        const mobile = width < 768;
-        const tablet = width >= 768 && width < 1100;
-
-        /*
-         * Mobile:
-         * 3 cards visíveis
-         *
-         * Tablet:
-         * 3 cards
-         *
-         * Desktop:
-         * 4 cards
-         */
-
-        const cardWidth = mobile
-          ? Math.min(Math.max(width * 0.29, 92), 135)
-          : tablet
-            ? 205
-            : 255;
-
-        const cardHeight = mobile
-          ? Math.min(Math.max(height * 0.24, 175), 210)
-          : tablet
-            ? 300
-            : 370;
-
-        const gap = mobile ? 9 : tablet ? 18 : 24;
-
-        const visibleCards = mobile ? 3 : tablet ? 3 : 4;
-
-        const totalWidth =
-          cardWidth * visibleCards +
-          gap * (visibleCards - 1);
-
-        const left = mobile
-          ? Math.max(16, (width - totalWidth) / 2)
-          : Math.max(40, width - totalWidth - 70);
-
-        const top = mobile
-          ? height - cardHeight - 42
-          : height - cardHeight - 70;
-
-        return {
-          width,
-          height,
-          mobile,
-          tablet,
-          cardWidth,
-          cardHeight,
-          gap,
-          visibleCards,
-          left,
-          top,
-        };
-      };
-
-      /* =====================================================
-         ELEMENT HELPERS
-      ===================================================== */
-
-      const getCard = (index: number) =>
-        container.querySelector<HTMLElement>(
-          `#card-${index}`,
-        );
-
-      const getCardContent = (index: number) =>
-        container.querySelector<HTMLElement>(
-          `#card-content-${index}`,
-        );
-
-      const getOverlay = (index: number) =>
-        container.querySelector<HTMLElement>(
-          `#overlay-${index}`,
-        );
-
-      const getImage = (index: number) =>
-        container.querySelector<HTMLElement>(
-          `#image-${index}`,
-        );
-
-      /* =====================================================
-         POSITION ARCHIVE
-      ===================================================== */
-
-      const getArchiveDistance = (
-        index: number,
-        active: number,
-      ) => {
-        if (index === active) return 0;
-
-        return (
-          (index - active - 1 + DATA.length) %
-          DATA.length
-        );
-      };
-
-      const positionCards = () => {
-        const {
-          width,
-          height,
-          cardWidth,
-          cardHeight,
-          gap,
-          left,
-          top,
-          mobile,
-        } = getLayout();
-
-        const active = activeRef.current;
-
-        DATA.forEach((_, index) => {
-          const card = getCard(index);
-          const content = getCardContent(index);
-          const image = getImage(index);
-
-          if (!card || !content) return;
-
-          /* =================================================
-             ACTIVE IMAGE
-          ================================================= */
-
-          if (index === active) {
-            gsap.set(card, {
-              x: 0,
-              y: 0,
-              width,
-              height,
-              borderRadius: 0,
-              zIndex: 20,
-              scale: 1,
-              opacity: 1,
-            });
-
-            gsap.set(content, {
-              x: mobile ? 20 : 0,
-              y: mobile ? 0 : 35,
-              opacity: 0,
-              zIndex: 50,
-            });
-
-            if (image) {
-              gsap.set(image, {
-                scale: 1.08,
-              });
-            }
-
-            return;
-          }
-
-          /* =================================================
-             ARCHIVE IMAGES
-          ================================================= */
-
-          const distance = getArchiveDistance(
-            index,
-            active,
-          );
-
-          const visiblePosition = Math.min(
-            distance,
-            3,
-          );
-
-          const x =
-            left +
-            visiblePosition *
-              (cardWidth + gap);
-
-          gsap.set(card, {
-            x,
-            y: top,
-            width: cardWidth,
-            height: cardHeight,
-            borderRadius: mobile ? 6 : 8,
-            zIndex: 30,
-            scale: 1,
-            opacity: 1,
-          });
-
-          gsap.set(content, {
-            x,
-            y: top + cardHeight - 58,
-            opacity:
-              visiblePosition < 3 ? 1 : 0,
-            zIndex: 40,
-          });
-
-          if (image) {
-            gsap.set(image, {
-              scale: 1,
-            });
-          }
-        });
-      };
-
-      /* =====================================================
-         IMAGE PRELOAD
-      ===================================================== */
-
-      const preloadImages = async () => {
-        await Promise.all(
-          DATA.map(
-            (item) =>
-              new Promise<void>((resolve) => {
-                const img = new Image();
-
-                img.onload = () => resolve();
-                img.onerror = () => resolve();
-
-                img.src = item.image;
-              }),
-          ),
-        );
-      };
-
-      /* =====================================================
-         INITIAL REVEAL
-      ===================================================== */
-
-      const reveal = () => {
-        const { width } = getLayout();
-
-        const cover =
-          container.querySelector<HTMLElement>(
-            ".hero-cover",
-          );
-
-        if (cover) {
-          gsap.to(cover, {
-            x: width + 100,
-            duration: reducedMotion ? 0 : 1.3,
-            delay: 0.1,
-            ease: "expo.inOut",
-          });
-        }
-
-        const activeContent = getCardContent(
-          activeRef.current,
-        );
-
-        if (activeContent) {
-          gsap.to(activeContent, {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            duration: reducedMotion ? 0 : 1,
-            delay: 0.45,
-            ease: "expo.out",
-          });
-        }
-
-        gsap.fromTo(
-          ".hero-kicker",
-          {
-            y: 20,
-            opacity: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: reducedMotion ? 0 : 0.8,
-            delay: 0.5,
-            ease: "expo.out",
-          },
-        );
-
-        gsap.fromTo(
-          ".hero-wordmark",
-          {
-            y: 70,
-            opacity: 0,
-            filter: "blur(10px)",
-          },
-          {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: reducedMotion ? 0 : 1.1,
-            delay: 0.55,
-            ease: "expo.out",
-          },
-        );
-
-        gsap.fromTo(
-          ".hero-description",
-          {
-            y: 20,
-            opacity: 0,
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: reducedMotion ? 0 : 0.8,
-            delay: 0.75,
-            ease: "expo.out",
-          },
-        );
-      };
-
-      /* =====================================================
-         AUTOPLAY
-      ===================================================== */
-
-      const scheduleAutoplay = () => {
-        if (autoplayRef.current) {
-          clearTimeout(autoplayRef.current);
-        }
-
-        if (pausedRef.current) return;
-
-        autoplayRef.current = setTimeout(() => {
-          if (
-            pausedRef.current ||
-            animatingRef.current
-          ) {
-            scheduleAutoplay();
-            return;
-          }
-
-          const next =
-            (activeRef.current + 1) %
-            DATA.length;
-
-          goTo(next, 1);
-        }, 5500);
-      };
-
-      /* =====================================================
-         MAIN SLIDE TRANSITION
-      ===================================================== */
-
-      const goTo = (
-        nextIndex: number,
-        direction: 1 | -1 = 1,
-      ) => {
-        if (
-          nextIndex === activeRef.current ||
-          animatingRef.current
-        ) {
-          return;
-        }
-
-        animatingRef.current = true;
-
-        if (autoplayRef.current) {
-          clearTimeout(autoplayRef.current);
-        }
-
-        const {
-          width,
-          height,
-          cardWidth,
-          cardHeight,
-          gap,
-          left,
-          top,
-          mobile,
-        } = getLayout();
-
-        const oldIndex = activeRef.current;
-
-        const oldCard = getCard(oldIndex);
-        const newCard = getCard(nextIndex);
-
-        const oldContent =
-          getCardContent(oldIndex);
-
-        const newContent =
-          getCardContent(nextIndex);
-
-        if (!oldCard || !newCard) {
-          animatingRef.current = false;
-          return;
-        }
-
-        activeRef.current = nextIndex;
-        setActiveIndex(nextIndex);
-
-        /* =================================================
-           INCOMING CARD
-        ================================================= */
-
-        gsap.set(newCard, {
-          x:
-            direction > 0
-              ? width
-              : -width,
-          y: 0,
-          width,
-          height,
-          borderRadius: 0,
-          zIndex: 25,
-          scale: 1,
-          opacity: 1,
-        });
-
-        const newImage = getImage(nextIndex);
-
-        if (newImage) {
-          gsap.set(newImage, {
-            scale: 1.08,
-          });
-        }
-
-        const newOverlay =
-          getOverlay(nextIndex);
-
-        if (newOverlay) {
-          gsap.set(newOverlay, {
-            opacity: 0.3,
-          });
-        }
-
-        /* =================================================
-           OLD TEXT OUT
-        ================================================= */
-
-        if (oldContent) {
-          gsap.to(oldContent, {
-            opacity: 0,
-            y: 25,
-            duration: reducedMotion ? 0 : 0.3,
-            ease: "power2.in",
-          });
-        }
-
-        /* =================================================
-           TIMELINE
-        ================================================= */
-
-        const tl = gsap.timeline({
-          onComplete: () => {
-            /* =============================================
-               OLD CARD → ARCHIVE
-            ============================================= */
-
-            const archiveX =
-              left +
-              3 * (cardWidth + gap);
-
-            gsap.set(oldCard, {
-              x: archiveX,
-              y: top,
-              width: cardWidth,
-              height: cardHeight,
-              borderRadius: mobile ? 6 : 8,
-              zIndex: 30,
-              scale: 1,
-              opacity: 1,
-            });
-
-            const oldImage =
-              getImage(oldIndex);
-
-            if (oldImage) {
-              gsap.set(oldImage, {
-                scale: 1,
-              });
-            }
-
-            if (oldContent) {
-              gsap.set(oldContent, {
-                x: archiveX,
-                y: top + cardHeight - 58,
-                opacity: 0,
-                zIndex: 40,
-              });
-            }
-
-            /* =============================================
-               NEW CARD → ACTIVE
-            ============================================= */
-
-            gsap.set(newCard, {
-              x: 0,
-              y: 0,
-              width,
-              height,
-              borderRadius: 0,
-              zIndex: 20,
-            });
-
-            /* =============================================
-               REPOSITION ARCHIVE
-            ============================================= */
-
-            DATA.forEach((_, index) => {
-              if (
-                index === nextIndex ||
-                index === oldIndex
-              ) {
-                return;
-              }
-
-              const distance =
-                getArchiveDistance(
-                  index,
-                  nextIndex,
-                );
-
-              if (distance > 3) return;
-
-              const x =
-                left +
-                distance *
-                  (cardWidth + gap);
-
-              const card = getCard(index);
-              const content =
-                getCardContent(index);
-
-              if (card) {
-                gsap.set(card, {
-                  x,
-                  y: top,
-                  width: cardWidth,
-                  height: cardHeight,
-                  borderRadius: mobile
-                    ? 6
-                    : 8,
-                  zIndex: 30,
-                });
-              }
-
-              if (content) {
-                gsap.set(content, {
-                  x,
-                  y:
-                    top +
-                    cardHeight -
-                    58,
-                  opacity:
-                    distance < 3 ? 1 : 0,
-                  zIndex: 40,
-                });
-              }
-            });
-
-            animatingRef.current = false;
-
-            scheduleAutoplay();
-          },
-        });
-
-        /* =================================================
-           IMAGE SLIDE
-        ================================================= */
-
-        tl.to(
-          newCard,
-          {
-            x: 0,
-            duration: reducedMotion ? 0 : 1.25,
-            ease: "expo.inOut",
-          },
-          0,
-        );
-
-        /* =================================================
-           IMAGE ZOOM
-        ================================================= */
-
-        if (newImage) {
-          tl.to(
-            newImage,
-            {
-              scale: 1,
-              duration: reducedMotion ? 0 : 1.5,
-              ease: "power2.out",
-            },
-            0,
-          );
-        }
-
-        /* =================================================
-           OVERLAY
-        ================================================= */
-
-        if (newOverlay) {
-          tl.to(
-            newOverlay,
-            {
-              opacity: 0.38,
-              duration: reducedMotion ? 0 : 0.9,
-              ease: "power2.out",
-            },
-            0.15,
-          );
-        }
-
-        /* =================================================
-           ARCHIVE CARDS
-        ================================================= */
-
-        DATA.forEach((_, index) => {
-          if (
-            index === nextIndex ||
-            index === oldIndex
-          ) {
-            return;
-          }
-
-          const distance =
-            getArchiveDistance(
-              index,
-              nextIndex,
-            );
-
-          if (distance > 3) return;
-
-          const x =
-            left +
-            distance *
-              (cardWidth + gap);
-
-          const card = getCard(index);
-          const content =
-            getCardContent(index);
-
-          if (card) {
-            tl.to(
-              card,
-              {
-                x,
-                y: top,
-                width: cardWidth,
-                height: cardHeight,
-                borderRadius: mobile
-                  ? 6
-                  : 8,
-                duration: reducedMotion
-                  ? 0
-                  : 0.85,
-                ease: "expo.inOut",
-              },
-              0.1,
-            );
-          }
-
-          if (content) {
-            tl.to(
-              content,
-              {
-                x,
-                y:
-                  top +
-                  cardHeight -
-                  58,
-                opacity:
-                  distance < 3 ? 1 : 0,
-                duration: reducedMotion
-                  ? 0
-                  : 0.85,
-                ease: "expo.inOut",
-              },
-              0.1,
-            );
-          }
-        });
-
-        /* =================================================
-           HERO COPY
-        ================================================= */
-
-        if (newContent) {
-          tl.fromTo(
-            newContent,
-            {
-              opacity: 0,
-              x: mobile ? 20 : -45,
-              y: mobile ? 0 : 35,
-            },
-            {
-              opacity: 1,
-              x: 0,
-              y: 0,
-              duration: reducedMotion
-                ? 0
-                : 0.85,
-              ease: "expo.out",
-            },
-            0.75,
-          );
-        }
-
-        /* =================================================
-           COUNTER
-        ================================================= */
-
-        tl.fromTo(
-          ".slide-counter",
-          {
-            opacity: 0.2,
-            y: 8,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: reducedMotion
-              ? 0
-              : 0.35,
-          },
-          0.65,
-        );
-      };
-
-      /* =====================================================
-         RESIZE
-      ===================================================== */
-
-      const handleResize = () => {
-        if (animatingRef.current) return;
-
-        positionCards();
-      };
-
-      /* =====================================================
-         NAVIGATION EVENT
-      ===================================================== */
-
-      const handleNavigation = (
-        event: Event,
-      ) => {
-        const customEvent =
-          event as CustomEvent<{
-            index: number;
-            direction: 1 | -1;
-          }>;
-
-        const nextIndex =
-          customEvent.detail?.index;
-
-        const direction =
-          customEvent.detail?.direction ??
-          1;
-
-        if (
-          typeof nextIndex !== "number" ||
-          nextIndex === activeRef.current ||
-          animatingRef.current
-        ) {
-          return;
-        }
-
-        goTo(nextIndex, direction);
-      };
-
-      /* =====================================================
-         INITIALIZATION
-      ===================================================== */
-
-      positionCards();
-
-      const initialize = async () => {
-        await preloadImages();
-
-        const activeCard =
-          getCard(activeRef.current);
-
-        const activeImage =
-          getImage(activeRef.current);
-
-        if (activeCard) {
-          gsap.set(activeCard, {
-            opacity: 1,
-          });
-        }
-
-        if (activeImage) {
-          gsap.set(activeImage, {
-            opacity: 1,
-          });
-        }
-
-        reveal();
-        scheduleAutoplay();
-      };
-
-      initialize();
-
-      container.addEventListener(
-        "tanosi-gsap-go",
-        handleNavigation,
-      );
-
-      window.addEventListener(
-        "resize",
-        handleResize,
-      );
-
-      return () => {
-        window.removeEventListener(
-          "resize",
-          handleResize,
-        );
-
-        container.removeEventListener(
-          "tanosi-gsap-go",
-          handleNavigation,
-        );
-
-        if (autoplayRef.current) {
-          clearTimeout(autoplayRef.current);
-        }
-
-        gsap.killTweensOf(container);
-      };
-    },
-    {
-      scope: containerRef,
-    },
+  const activeProduct = DATA[activeIndex];
+
+  const completedPurchases = Math.min(
+    Math.max(purchasesCount, 0),
+    FIRST_PHASE_LIMIT
   );
 
-  /* =========================================================
-     NEXT / PREVIOUS
-  ========================================================= */
+  const remainingPurchases =
+    FIRST_PHASE_LIMIT - completedPurchases;
 
-  const nextSlide = () => {
-    if (animatingRef.current) return;
+  const progress =
+    (completedPurchases / FIRST_PHASE_LIMIT) * 100;
 
-    const next =
-      (activeRef.current + 1) %
-      DATA.length;
+  const goToSlide = React.useCallback((index: number) => {
+    setActiveIndex((index + DATA.length) % DATA.length);
+  }, []);
 
-    containerRef.current?.dispatchEvent(
-      new CustomEvent("tanosi-gsap-go", {
-        detail: {
-          index: next,
-          direction: 1,
-        },
-      }),
-    );
-  };
+  const nextSlide = React.useCallback(() => {
+    setActiveIndex((current) => (current + 1) % DATA.length);
+  }, []);
 
-  const previousSlide = () => {
-    if (animatingRef.current) return;
+  const previousSlide = React.useCallback(() => {
+    setActiveIndex((current) => (
+      current - 1 + DATA.length
+    ) % DATA.length);
+  }, []);
 
-    const previous =
-      (activeRef.current - 1 + DATA.length) %
-      DATA.length;
+  React.useEffect(() => {
+    if (isPaused) return;
 
-    containerRef.current?.dispatchEvent(
-      new CustomEvent("tanosi-gsap-go", {
-        detail: {
-          index: previous,
-          direction: -1,
-        },
-      }),
-    );
-  };
+    const interval = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % DATA.length);
+    }, 6000);
 
-  /* =========================================================
-     MOBILE SWIPE
-  ========================================================= */
+    return () => window.clearInterval(interval);
+  }, [isPaused]);
 
-  const handleTouchStart = (
-    event: React.TouchEvent,
-  ) => {
+  React.useEffect(() => {
+    DATA.forEach((product) => {
+      const image = new Image();
+      image.src = product.image;
+    });
+  }, []);
+
+  const handleTouchStart = (event: React.TouchEvent) => {
     if (event.touches.length !== 1) return;
 
-    touchStartX.current =
-      event.touches[0].clientX;
-
-    touchStartY.current =
-      event.touches[0].clientY;
-
-    pausedRef.current = true;
+    touchStartX.current = event.touches[0].clientX;
+    touchStartY.current = event.touches[0].clientY;
   };
 
-  const handleTouchEnd = (
-    event: React.TouchEvent,
-  ) => {
+  const handleTouchEnd = (event: React.TouchEvent) => {
     if (
       touchStartX.current === null ||
       touchStartY.current === null
@@ -1037,370 +186,336 @@ export function GlobeHero() {
       return;
     }
 
-    const endX =
-      event.changedTouches[0].clientX;
-
-    const endY =
-      event.changedTouches[0].clientY;
-
     const deltaX =
-      endX - touchStartX.current;
+      event.changedTouches[0].clientX - touchStartX.current;
 
     const deltaY =
-      endY - touchStartY.current;
+      event.changedTouches[0].clientY - touchStartY.current;
 
     touchStartX.current = null;
     touchStartY.current = null;
-
-    /*
-     * Only interpret reasonably horizontal
-     * gestures as carousel navigation.
-     */
 
     if (
       Math.abs(deltaX) < 45 ||
       Math.abs(deltaX) < Math.abs(deltaY)
     ) {
-      pausedRef.current = isPaused;
       return;
     }
 
-    if (deltaX < 0) {
-      nextSlide();
-    } else {
-      previousSlide();
-    }
-
-    /*
-     * Allow autoplay to resume after
-     * the interaction.
-     */
-
-    setTimeout(() => {
-      if (!isPaused) {
-        pausedRef.current = false;
-      }
-    }, 700);
+    if (deltaX < 0) nextSlide();
+    else previousSlide();
   };
-
-  /* =========================================================
-     RENDER
-  ========================================================= */
 
   return (
     <section
-      ref={containerRef}
-      className="relative h-[100svh] min-h-[680px] w-full overflow-hidden bg-black text-white select-none"
-      onMouseEnter={() => {
-        pausedRef.current = true;
-        setIsPaused(true);
-      }}
-      onMouseLeave={() => {
-        pausedRef.current = false;
-        setIsPaused(false);
-      }}
+      className="relative w-full overflow-hidden bg-white text-black"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* =====================================================
-          BACKGROUND
-      ===================================================== */}
+      {/* Announcement bar */}
+      <div className="relative z-20 flex min-h-9 items-center justify-center gap-2 bg-black px-3 py-2 text-center text-[8px] font-bold uppercase tracking-[0.15em] text-white sm:text-[9px] sm:tracking-[0.2em]">
+        <Sparkles className="h-3 w-3 shrink-0 text-zinc-400" />
 
-      <div className="absolute inset-0 z-0 bg-black" />
+        <span>Pré-encomendas abertas</span>
+        <span className="text-zinc-500">·</span>
 
-      {/* =====================================================
-          CINEMATIC OVERLAYS
-      ===================================================== */}
-
-      <div className="pointer-events-none absolute inset-0 z-30 bg-[linear-gradient(90deg,rgba(0,0,0,.88)_0%,rgba(0,0,0,.48)_38%,rgba(0,0,0,.08)_75%,rgba(0,0,0,.28)_100%)]" />
-
-      <div className="pointer-events-none absolute inset-0 z-30 bg-[linear-gradient(0deg,rgba(0,0,0,.82)_0%,transparent_38%,rgba(0,0,0,.18)_100%)]" />
-
-      {/* =====================================================
-          TECHNICAL LABEL
-      ===================================================== */}
-
-      <div className="pointer-events-none absolute left-5 top-12 z-50 hidden md:block lg:left-12">
-        <div className="space-y-1 font-mono">
-          <div className="text-[9px] uppercase tracking-[0.3em] text-white/35">
-            TANOSI / ARQUIVO
-          </div>
-
-          <div className="text-[8px] uppercase tracking-[0.22em] text-white/20">
-            SISTEMA VISUAL 01
-          </div>
-        </div>
+        <span className="text-zinc-300">
+          Primeira fase limitada a 30 compras
+        </span>
       </div>
 
-      {/* =====================================================
-          MAIN COPY
-      ===================================================== */}
+      {/* Main hero */}
+      <div className="mx-auto flex min-h-0 max-w-[1600px] flex-col px-4 pb-7 pt-5 sm:px-7 sm:pb-9 sm:pt-7 lg:min-h-[calc(100svh-36px)] lg:justify-center lg:px-12 lg:py-6 xl:px-16">
 
-      <div className="pointer-events-none absolute inset-x-0 top-[17%] z-40 px-5 sm:top-[20%] sm:px-8 md:left-12 md:right-auto md:top-[25%] md:px-0 lg:left-16">
-        <div className="max-w-[650px]">
-          <div className="hero-kicker mb-4 flex items-center gap-3 opacity-0">
-            <span className="h-px w-8 bg-white/50" />
+        {/* Header */}
+        <div className="mb-5 flex items-center justify-between sm:mb-6 lg:mb-4">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-black" />
 
-            <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-white/60">
-              {activeData.collection}
+            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-500 sm:text-[9px]">
+              Colecção disponível para pré-encomenda
             </span>
           </div>
 
-          <h1 className="hero-wordmark text-[17vw] font-black uppercase leading-[0.76] tracking-[-0.09em] sm:text-[15vw] md:text-[10vw] lg:text-[9vw]">
-            <span className="block">
-              {activeData.title}
-            </span>
-
-            <span className="block text-white/25">
-              {activeData.title2}
-            </span>
-          </h1>
-
-          <p className="hero-description mt-7 max-w-[440px] text-xs font-medium leading-relaxed text-white/55 sm:text-sm">
-            {activeData.description}
-          </p>
+          <span className="hidden text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 sm:block">
+            TANOSI — Stay Weird
+          </span>
         </div>
-      </div>
 
-      {/* =====================================================
-          IMAGE SLIDER
-      ===================================================== */}
+        {/* Main content */}
+        <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-14">
 
-      <div
-        id="tanosi-slider"
-        className="absolute inset-0 z-10"
-      >
-        {DATA.map((item, index) => (
-          <div
-            key={item.id}
-            id={`card-${index}`}
-            className="absolute overflow-hidden bg-zinc-950"
-            aria-hidden={index !== activeIndex}
-          >
-            {/* Actual image */}
-            <div
-              id={`image-${index}`}
-              className="absolute -inset-[3%] bg-cover bg-center will-change-transform"
-              style={{
-                backgroundImage: `url(${item.image})`,
-              }}
-            />
+          {/* Product information */}
+          <div className="order-2 flex min-w-0 flex-col lg:order-1">
 
-            {/* Dark treatment */}
-            <div
-              id={`overlay-${index}`}
-              className="absolute inset-0 bg-black/35"
-            />
+            <div className="mb-3 flex items-center gap-3 lg:mb-4">
+              <span className="h-px w-7 bg-black" />
 
-            {/* Bottom cinematic gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/10" />
-
-            {/* Archive number */}
-            <div className="absolute right-3 top-3 z-10 font-mono text-[8px] tracking-[0.2em] text-white/50">
-              {item.tag}
-            </div>
-
-            {/* Product type */}
-            <div className="absolute bottom-3 left-3 z-10 font-mono text-[7px] uppercase tracking-[0.18em] text-white/45">
-              {item.type}
-            </div>
-          </div>
-        ))}
-
-        {/* ===================================================
-            ARCHIVE CAPTIONS
-        =================================================== */}
-
-        {DATA.map((item, index) => (
-          <div
-            key={item.id}
-            id={`card-content-${index}`}
-            className="pointer-events-none absolute z-40 w-[135px] text-white sm:w-[200px] md:w-[255px]"
-          >
-            <div className="mb-1 flex items-center gap-2">
-              <span className="h-px w-4 bg-white/50" />
-
-              <span className="text-[7px] font-bold uppercase tracking-[0.2em] text-white/60 sm:text-[8px]">
-                {item.collection}
+              <span className="text-[9px] font-bold uppercase tracking-[0.23em] text-zinc-500">
+                {activeProduct.collection}
               </span>
             </div>
 
-            <div className="text-[14px] font-black uppercase leading-none tracking-[-0.05em] sm:text-lg md:text-xl">
-              {item.title}
+            <div
+              key={activeProduct.id}
+              className="animate-[fadeUp_.5s_ease_both]"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+                {activeProduct.type}
+              </p>
+
+              <h2 className="mt-2 text-[13vw] font-black uppercase leading-[0.78] tracking-[-0.09em] sm:text-7xl md:text-8xl lg:text-[5.2vw] xl:text-[82px] 2xl:text-[94px]">
+                {activeProduct.title}
+
+                <span className="mt-2 block text-zinc-300">
+                  {activeProduct.title2}
+                </span>
+              </h2>
+
+              <p className="mt-4 max-w-sm text-[11px] leading-5 text-zinc-500 sm:text-xs sm:leading-6 lg:mt-5">
+                {activeProduct.description}
+              </p>
             </div>
 
-            <div className="text-[14px] font-black uppercase leading-none tracking-[-0.05em] text-white/35 sm:text-lg md:text-xl">
-              {item.title2}
+            {/* CTA */}
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center lg:mt-6">
+              <Link
+                href="/collections/all"
+                className="group inline-flex min-h-12 items-center justify-center gap-4 rounded-full bg-black px-6 text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-all duration-300 hover:bg-zinc-800 active:scale-[0.98]"
+              >
+                Explorar colecção
+
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+
+              <span className="text-center text-[8px] font-medium uppercase tracking-[0.15em] text-zinc-400 sm:text-left">
+                Reserva a tua peça
+              </span>
+            </div>
+
+            {/* First phase counter */}
+            <div className="mt-7 max-w-sm border-t border-zinc-200 pt-4 lg:mt-8">
+
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black" />
+
+                    <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                      Primeira fase
+                    </span>
+                  </div>
+
+                  <p className="mt-2 text-xs font-bold uppercase tracking-tight">
+                    As primeiras 30 compras
+                  </p>
+
+                  <p className="mt-1 text-[9px] text-zinc-400">
+                    Lugares limitados nesta primeira fase.
+                  </p>
+                </div>
+
+                <div className="shrink-0 text-right">
+                  <span className="block text-2xl font-black tracking-[-0.07em] tabular-nums">
+                    {String(remainingPurchases).padStart(2, "0")}
+                  </span>
+
+                  <span className="text-[8px] font-bold uppercase tracking-[0.15em] text-zinc-400">
+                    Restantes
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div
+                  className="h-full rounded-full bg-black transition-all duration-700 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-[8px] font-medium uppercase tracking-wider text-zinc-400">
+                  {completedPurchases} compras realizadas
+                </span>
+
+                <span className="text-[8px] font-medium uppercase tracking-wider text-zinc-400">
+                  {FIRST_PHASE_LIMIT} lugares
+                </span>
+              </div>
+
+              {remainingPurchases === 0 && (
+                <p className="mt-3 text-[9px] font-bold uppercase tracking-wider text-black">
+                  Primeira fase esgotada.
+                </p>
+              )}
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* =====================================================
-          MOBILE INFO
-      ===================================================== */}
+          {/* Product image */}
+          <div className="order-1 min-w-0 lg:order-2">
 
-      <div className="absolute bottom-[255px] left-5 right-5 z-50 block sm:bottom-[275px] md:hidden">
-        <div className="flex items-end justify-between gap-5">
+            <div className="relative mx-auto w-full max-w-[680px] lg:max-w-none">
+
+              {/* Image frame */}
+              <div className="group relative aspect-[5/4.5] w-full overflow-hidden bg-zinc-100 sm:aspect-[5/4] lg:aspect-[1.12/1] lg:max-h-[min(64vh,590px)]">
+
+                {DATA.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                      index === activeIndex
+                        ? "scale-100 opacity-100"
+                        : "scale-[1.03] opacity-0"
+                    }`}
+                    aria-hidden={index !== activeIndex}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={product.image}
+                      alt={`${product.title} ${product.title2} - TANOSI`}
+                      className="h-full w-full object-cover object-center"
+                    />
+                  </div>
+                ))}
+
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/5" />
+
+                {/* Top labels */}
+                <div className="absolute left-3 top-3 z-10 sm:left-5 sm:top-5">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/90 px-3 py-1.5 text-[7px] font-bold uppercase tracking-[0.15em] text-black backdrop-blur-md sm:text-[8px]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black" />
+                    Pré-encomenda
+                  </span>
+                </div>
+
+                <div className="absolute right-3 top-3 z-10 font-mono text-[9px] tracking-[0.15em] text-white sm:right-5 sm:top-5">
+                  {activeProduct.tag}
+                  <span className="mx-1 text-white/50">/</span>
+                  {String(DATA.length).padStart(2, "0")}
+                </div>
+
+                {/* Bottom label */}
+                <div className="absolute bottom-3 left-3 z-10 sm:bottom-5 sm:left-5">
+                  <p className="text-[7px] font-bold uppercase tracking-[0.25em] text-white/70 sm:text-[8px]">
+                    TANOSI ARCHIVE
+                  </p>
+
+                  <p className="mt-1 text-lg font-black uppercase tracking-[-0.05em] text-white sm:text-2xl">
+                    {activeProduct.title2}
+                  </p>
+                </div>
+
+                {/* Navigation */}
+                <div className="absolute bottom-3 right-3 z-10 flex items-center gap-2 sm:bottom-5 sm:right-5">
+                  <button
+                    type="button"
+                    onClick={previousSlide}
+                    aria-label="Produto anterior"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white backdrop-blur-md transition-all hover:bg-white hover:text-black active:scale-90"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={nextSlide}
+                    aria-label="Produto seguinte"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white backdrop-blur-md transition-all hover:bg-white hover:text-black active:scale-90"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Thumbnails */}
+              <div className="mt-3 flex items-center justify-between gap-3">
+
+                <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto pb-1">
+                  {DATA.map((product, index) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => goToSlide(index)}
+                      aria-label={`Ver produto ${index + 1}`}
+                      aria-pressed={index === activeIndex}
+                      className={`relative h-11 w-9 shrink-0 overflow-hidden border transition-all duration-300 sm:h-12 sm:w-10 ${
+                        index === activeIndex
+                          ? "border-black opacity-100"
+                          : "border-zinc-200 opacity-45 hover:opacity-100"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={product.image}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <span className="hidden shrink-0 font-mono text-[9px] tracking-[0.15em] text-zinc-400 sm:block">
+                  {String(activeIndex + 1).padStart(2, "0")} — 09
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom trust strip */}
+        <div className="mt-7 grid grid-cols-2 gap-3 border-t border-zinc-200 pt-4 sm:mt-9 sm:grid-cols-3 sm:gap-6 lg:mt-5 lg:pt-4">
+
           <div>
-            <div className="mb-2 text-[8px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Peça seleccionada
-            </div>
+            <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-black">
+              Pré-encomenda
+            </p>
 
-            <div className="text-xl font-black uppercase leading-none tracking-[-0.06em]">
-              {activeData.title}{" "}
-              {activeData.title2}
-            </div>
-
-            <div className="mt-2 text-[8px] font-medium uppercase tracking-[0.2em] text-white/35">
-              {activeData.type}
-            </div>
+            <p className="mt-1 text-[8px] text-zinc-400 sm:text-[9px]">
+              Reserva antes da disponibilidade geral.
+            </p>
           </div>
 
-          <Link
-            href="/collections/all"
-            className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform active:scale-90"
-            aria-label="Explorar colecção"
-          >
-            <ArrowRight size={17} />
-          </Link>
+          <div className="border-l border-zinc-200 pl-3 sm:pl-6">
+            <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-black">
+              Edição limitada
+            </p>
+
+            <p className="mt-1 text-[8px] text-zinc-400 sm:text-[9px]">
+              Primeira fase com apenas 30 compras.
+            </p>
+          </div>
+
+          <div className="col-span-2 border-t border-zinc-200 pt-3 sm:col-span-1 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.15em] text-black">
+              TANOSI
+            </p>
+
+            <p className="mt-1 text-[8px] text-zinc-400 sm:text-[9px]">
+              Stay Weird. Make Art.
+            </p>
+          </div>
         </div>
       </div>
-
-      {/* =====================================================
-          DESKTOP CTA
-      ===================================================== */}
-
-      <Link
-        href="/collections/all"
-        className="pointer-events-auto absolute bottom-12 right-8 z-[60] hidden items-center gap-4 text-[10px] font-bold uppercase tracking-[0.25em] md:flex lg:right-16"
-      >
-        <span className="text-white/50 transition-colors hover:text-white">
-          Explorar colecção
-        </span>
-
-        <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 transition-all hover:border-white hover:bg-white hover:text-black">
-          <ArrowDownRight size={17} />
-        </span>
-      </Link>
-
-      {/* =====================================================
-          CONTROLS
-      ===================================================== */}
-
-      <div className="absolute bottom-7 left-5 z-[60] flex items-center gap-4 sm:left-8 md:bottom-12 md:left-auto md:right-[360px]">
-        <button
-          type="button"
-          onClick={previousSlide}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/60 transition-all hover:border-white hover:text-white active:scale-90"
-          aria-label="Peça anterior"
-        >
-          <ChevronLeft size={17} />
-        </button>
-
-        <div className="slide-counter min-w-[55px] text-center font-mono text-[9px] tracking-[0.25em] text-white/50">
-          {String(activeIndex + 1).padStart(
-            2,
-            "0",
-          )}
-
-          <span className="mx-2 text-white/20">
-            /
-          </span>
-
-          {String(DATA.length).padStart(
-            2,
-            "0",
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={nextSlide}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/60 transition-all hover:border-white hover:text-white active:scale-90"
-          aria-label="Peça seguinte"
-        >
-          <ChevronRight size={17} />
-        </button>
-      </div>
-
-      {/* =====================================================
-          MOBILE SWIPE INDICATOR
-      ===================================================== */}
-
-      <div className="pointer-events-none absolute bottom-[215px] left-5 z-50 flex items-center gap-2 md:hidden">
-        <span className="h-px w-5 bg-white/30" />
-
-        <span className="font-mono text-[7px] uppercase tracking-[0.25em] text-white/30">
-          Deslize para explorar
-        </span>
-      </div>
-
-      {/* =====================================================
-          PROGRESS
-      ===================================================== */}
-
-      <div className="absolute bottom-0 left-0 right-0 z-[60] h-px bg-white/10">
-        <div
-          className="h-full bg-white transition-all duration-500"
-          style={{
-            width: `${
-              ((activeIndex + 1) /
-                DATA.length) *
-              100
-            }%`,
-          }}
-        />
-      </div>
-
-      {/* =====================================================
-          INITIAL LOADER
-      ===================================================== */}
-
-      <div className="hero-cover pointer-events-none absolute inset-y-0 left-0 z-[100] w-full bg-black" />
-
-      {/* =====================================================
-          SCAN LINE
-      ===================================================== */}
-
-      <div className="pointer-events-none absolute left-0 right-0 top-0 z-[75] h-px animate-[scan_5s_linear_infinite] bg-white/10" />
-
-      {/* =====================================================
-          MOTION
-      ===================================================== */}
 
       <style jsx>{`
-        @keyframes scan {
-          0% {
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+
+          to {
+            opacity: 1;
             transform: translateY(0);
-            opacity: 0;
-          }
-
-          10% {
-            opacity: 1;
-          }
-
-          90% {
-            opacity: 1;
-          }
-
-          100% {
-            transform: translateY(100vh);
-            opacity: 0;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
           * {
             animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
-          }
-        }
-
-        @media (max-width: 767px) {
-          #tanosi-slider {
-            touch-action: pan-y;
           }
         }
       `}</style>

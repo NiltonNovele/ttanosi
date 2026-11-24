@@ -15,7 +15,6 @@ export default function Home() {
         category="trending" 
         viewAllLink="/collections/trending"
       />
-      <CategoryShowcase />
       <MovementMarquee />
     </div>
   );

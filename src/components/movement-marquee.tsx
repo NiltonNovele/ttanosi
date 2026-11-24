@@ -1,20 +1,25 @@
+
 "use client";
 
 import React from "react";
 
 export function MovementMarquee() {
   const text = "STAY WEIRD, MAKE ART, CONFUSE PEOPLE AND LET GOD DO THE REST.";
-  const repeatedText = Array(15).fill(text).join("                  ✦                  ");
+  const repeatedText = Array(15)
+    .fill(text)
+    .join("                    ✦                    ");
 
   return (
-    <div className="relative w-full overflow-hidden bg-foreground py-5 mt-24 mb-0 border-t border-white/10">
+    <div className="relative mt-24 mb-0 w-full overflow-hidden border-y border-zinc-200 bg-white py-5">
       <div className="flex whitespace-nowrap animate-marquee">
-        <span className="text-xs md:text-sm font-black text-background/80 uppercase tracking-[0.4em] inline-block px-12 leading-none">
-          {repeatedText}
-        </span>
-        <span className="text-xs md:text-sm font-black text-background/80 uppercase tracking-[0.4em] inline-block px-12 leading-none">
-          {repeatedText}
-        </span>
+        {[0, 1].map((item) => (
+          <span
+            key={item}
+            className="inline-block px-12 text-xs font-black uppercase tracking-[0.3em] text-black/80 leading-none md:text-sm"
+          >
+            {repeatedText}
+          </span>
+        ))}
       </div>
 
       <style jsx>{`
@@ -29,6 +34,12 @@ export function MovementMarquee() {
 
           100% {
             transform: translateX(-50%);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .animate-marquee {
+            animation: none;
           }
         }
       `}</style>

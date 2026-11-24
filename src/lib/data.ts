@@ -20,7 +20,7 @@ export const mockProducts: Product[] = [
     category: "mens",
     sizes: ["S", "M", "L", "XL"],
     isNewArrival: true,
-    images: ["/images/landing/farmanoo.jpg"],
+    images: ["/tshirt/landing/black1.png"],
   },
   {
     id: "p_02",
