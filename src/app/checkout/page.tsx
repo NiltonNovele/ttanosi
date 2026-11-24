@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -28,7 +29,7 @@ import Link from "next/link";
 import { Footer } from "@/components/footer";
 
 /* ============================================================
-   TIPOS
+   TYPES
    ============================================================ */
 
 type PaymentMethodId =
@@ -56,7 +57,7 @@ type FormData = {
 };
 
 /* ============================================================
-   MÉTODOS DE PAGAMENTO
+   PAYMENT METHODS
    ============================================================ */
 
 const paymentMethods: PaymentMethod[] = [
@@ -100,17 +101,20 @@ const paymentMethods: PaymentMethod[] = [
 ];
 
 /* ============================================================
-   ESTILOS
+   STYLES
    ============================================================ */
 
 const inputClassName =
-  "w-full rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3.5 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-zinc-700 hover:border-white/[0.16] focus:border-white/30 focus:bg-white/[0.055] focus:ring-4 focus:ring-white/[0.035]";
+  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-sm text-black outline-none transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 focus:border-black focus:ring-4 focus:ring-black/[0.04]";
 
 const labelClassName =
   "flex items-center gap-2 px-1 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500";
 
+const sectionClassName =
+  "overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_8px_35px_rgba(0,0,0,0.035)]";
+
 /* ============================================================
-   FORMATADORES
+   FORMATTERS
    ============================================================ */
 
 const formatMZN = (value: number) =>
@@ -123,14 +127,298 @@ const getPaymentLabel = (id: PaymentMethodId) =>
   paymentMethods.find((method) => method.id === id)?.title ?? id;
 
 /* ============================================================
-   COMPONENTE PRINCIPAL
+   REUSABLE COMPONENTS
+   ============================================================ */
+
+function SectionHeading({
+  icon: Icon,
+  title,
+  description,
+  number,
+}: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  number?: string;
+}) {
+  return (
+    <div className="flex items-center gap-4 border-b border-zinc-100 px-5 py-5 sm:px-7 sm:py-6">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50">
+        <Icon size={18} className="text-black" />
+      </div>
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-sm font-black uppercase tracking-tight text-black sm:text-base">
+            {title}
+          </h2>
+
+          {number && (
+            <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[8px] font-bold text-zinc-500">
+              {number}
+            </span>
+          )}
+        </div>
+
+        <p className="mt-1 text-[11px] text-zinc-500">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PaymentOptions({
+  selectedPayment,
+  onSelect,
+  disabled = false,
+  compact = false,
+}: {
+  selectedPayment: PaymentMethodId;
+  onSelect: (id: PaymentMethodId) => void;
+  disabled?: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <div className="space-y-3">
+      {paymentMethods.map((method) => {
+        const Icon = method.icon;
+        const isSelected = selectedPayment === method.id;
+
+        return (
+          <button
+            type="button"
+            key={method.id}
+            disabled={disabled}
+            onClick={() => onSelect(method.id)}
+            aria-pressed={isSelected}
+            className={`w-full rounded-xl border p-4 text-left transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
+              isSelected
+                ? "border-black bg-zinc-50 shadow-sm"
+                : "border-zinc-200 bg-white hover:border-zinc-400 hover:bg-zinc-50/70"
+            }`}
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors ${
+                  isSelected
+                    ? "bg-black text-white"
+                    : "border border-zinc-200 bg-white text-zinc-500"
+                }`}
+              >
+                <Icon size={18} />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3
+                    className={`text-[11px] font-black uppercase tracking-tight sm:text-xs ${
+                      isSelected ? "text-black" : "text-zinc-700"
+                    }`}
+                  >
+                    {method.title}
+                  </h3>
+
+                  {method.badge && (
+                    <span className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-[7px] font-bold uppercase tracking-wider text-zinc-500">
+                      {method.badge}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-1 text-[10px] leading-5 text-zinc-500">
+                  {method.description}
+                </p>
+              </div>
+
+              <div
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+                  isSelected
+                    ? "border-black bg-black"
+                    : "border-zinc-300 bg-white"
+                }`}
+              >
+                {isSelected && (
+                  <Check
+                    size={11}
+                    strokeWidth={3}
+                    className="text-white"
+                  />
+                )}
+              </div>
+            </div>
+
+            {method.images && (
+              <div className="ml-[58px] mt-3 flex flex-wrap items-center gap-2">
+                {method.images.slice(0, 3).map((image, index) => (
+                  <div
+                    key={`${method.id}-${index}`}
+                    className="flex h-8 min-w-11 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-white px-2"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={image}
+                      alt=""
+                      className="max-h-5 max-w-10 object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <AnimatePresence initial={false}>
+              {isSelected && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-4 border-t border-zinc-200 pt-3">
+                    <div className="flex gap-2.5 rounded-lg bg-white p-3">
+                      <Lock
+                        size={12}
+                        className="mt-0.5 shrink-0 text-zinc-400"
+                      />
+                      <p className="text-[9px] leading-5 text-zinc-500">
+                        {method.details}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function OrderItems({
+  items,
+  compact = false,
+}: {
+  items: {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image?: string;
+  }[];
+  compact?: boolean;
+}) {
+  return (
+    <div className={compact ? "space-y-4 p-5" : "max-h-[440px] space-y-5 overflow-y-auto p-7"}>
+      {items.map((item) => (
+        <div key={item.id} className="flex gap-3.5 sm:gap-4">
+          <div
+            className={`relative shrink-0 overflow-hidden rounded-xl bg-zinc-100 ${
+              compact ? "h-20 w-16" : "h-24 w-20"
+            }`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={
+                item.image ||
+                "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=80"
+              }
+              alt={item.name}
+              className="h-full w-full object-cover"
+            />
+
+            <div className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[8px] font-bold text-white">
+              {item.quantity}
+            </div>
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col justify-between">
+            <div>
+              <h3 className="line-clamp-2 text-[12px] font-bold leading-[1.3] text-black sm:text-sm">
+                {item.name}
+              </h3>
+
+              <p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-zinc-400">
+                Quantidade / {item.quantity}
+              </p>
+            </div>
+
+            <p className="text-[12px] font-bold text-black sm:text-sm">
+              {formatMZN(item.price * item.quantity)}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function OrderTotals({
+  subtotal,
+  shipping,
+  taxes,
+  total,
+  compact = false,
+}: {
+  subtotal: number;
+  shipping: number;
+  taxes: number;
+  total: number;
+  compact?: boolean;
+}) {
+  return (
+    <div className={compact ? "border-t border-zinc-200 p-5" : "border-t border-zinc-200 px-7 py-7"}>
+      <div className={`space-y-3 text-[11px] ${compact ? "" : "sm:text-sm"}`}>
+        <div className="flex justify-between">
+          <span className="text-zinc-500">Subtotal</span>
+          <span className="text-zinc-800">{formatMZN(subtotal)}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-zinc-500">Entrega</span>
+          <span className="text-zinc-800">{formatMZN(shipping)}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-zinc-500">Impostos</span>
+          <span className="text-zinc-800">{formatMZN(taxes)}</span>
+        </div>
+      </div>
+
+      <div className="my-5 h-px bg-zinc-200" />
+
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+            Total da encomenda
+          </p>
+
+          <p
+            className={`mt-1 font-black leading-none tracking-[-0.05em] text-black ${
+              compact ? "text-[29px]" : "text-3xl"
+            }`}
+          >
+            {formatMZN(total)}
+          </p>
+        </div>
+
+        <span className="rounded-full border border-zinc-200 px-2.5 py-1 text-[7px] font-bold uppercase tracking-widest text-zinc-500">
+          MZN
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   MAIN COMPONENT
    ============================================================ */
 
 export default function CheckoutPage() {
   const { items } = useCartStore();
 
   const [mounted, setMounted] = React.useState(false);
-
   const [mobileStep, setMobileStep] =
     React.useState<MobileStep>("dados");
 
@@ -140,8 +428,7 @@ export default function CheckoutPage() {
   const [selectedPayment, setSelectedPayment] =
     React.useState<PaymentMethodId>("cartao");
 
-  const [isProcessing, setIsProcessing] =
-    React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const [formData, setFormData] = React.useState<FormData>({
     firstName: "",
@@ -150,24 +437,12 @@ export default function CheckoutPage() {
     address: "",
   });
 
-  /* ============================================================
-     MOUNT
-     ============================================================ */
-
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  /* ============================================================
-     BODY SCROLL — MODAL
-     ============================================================ */
-
   React.useEffect(() => {
-    if (paymentModalOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = paymentModalOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -175,31 +450,33 @@ export default function CheckoutPage() {
   }, [paymentModalOpen]);
 
   /* ============================================================
-     TOTAIS
+     TOTALS
      ============================================================ */
 
-  const subtotal = React.useMemo(() => {
-    return items.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-  }, [items]);
+  const subtotal = React.useMemo(
+    () =>
+      items.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+    [items]
+  );
 
   const shipping = items.length > 0 ? 99 : 0;
-
   const taxes = Math.round(subtotal * 0.05);
-
   const total = subtotal + shipping + taxes;
 
-  const totalItems = React.useMemo(() => {
-    return items.reduce(
-      (total, item) => total + item.quantity,
-      0
-    );
-  }, [items]);
+  const totalItems = React.useMemo(
+    () =>
+      items.reduce(
+        (total, item) => total + item.quantity,
+        0
+      ),
+    [items]
+  );
 
   /* ============================================================
-     INPUTS
+     FORM
      ============================================================ */
 
   const handleInputChange = (
@@ -212,10 +489,6 @@ export default function CheckoutPage() {
       [name]: value,
     }));
   };
-
-  /* ============================================================
-     VALIDAÇÃO
-     ============================================================ */
 
   const validateCustomerDetails = () => {
     const fields = [
@@ -236,8 +509,7 @@ export default function CheckoutPage() {
 
     if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
       toast.error("E-mail inválido", {
-        description:
-          "Introduza um endereço de e-mail válido.",
+        description: "Introduza um endereço de e-mail válido.",
       });
 
       return false;
@@ -246,26 +518,17 @@ export default function CheckoutPage() {
     return true;
   };
 
-  /* ============================================================
-     MOBILE — DADOS → RESUMO
-     ============================================================ */
-
   const handleMobileContinue = () => {
     if (!validateCustomerDetails()) return;
-
     setMobileStep("resumo");
   };
-
-  /* ============================================================
-     MOBILE — VOLTAR AOS DADOS
-     ============================================================ */
 
   const handleMobileBack = () => {
     setMobileStep("dados");
   };
 
   /* ============================================================
-     MODAL
+     PAYMENT MODAL
      ============================================================ */
 
   const openPaymentModal = () => {
@@ -279,19 +542,17 @@ export default function CheckoutPage() {
 
   const closePaymentModal = () => {
     if (isProcessing) return;
-
     setPaymentModalOpen(false);
   };
 
   /* ============================================================
-     PAGAMENTO
+     PAYMENT
      ============================================================ */
 
   const continueToPayment = () => {
     if (!selectedPayment) {
       toast.error("Selecione um método de pagamento", {
-        description:
-          "Escolha uma opção para continuar.",
+        description: "Escolha uma opção para continuar.",
       });
 
       return;
@@ -313,12 +574,8 @@ export default function CheckoutPage() {
           email: formData.email.trim(),
           address: formData.address.trim(),
         },
-
         paymentMethod: selectedPayment,
-
-        paymentLabel:
-          getPaymentLabel(selectedPayment),
-
+        paymentLabel: getPaymentLabel(selectedPayment),
         items: items.map((item) => ({
           id: item.id,
           name: item.name,
@@ -326,14 +583,12 @@ export default function CheckoutPage() {
           quantity: item.quantity,
           image: item.image,
         })),
-
         totals: {
           subtotal,
           shipping,
           taxes,
           total,
         },
-
         createdAt: new Date().toISOString(),
       };
 
@@ -344,16 +599,11 @@ export default function CheckoutPage() {
 
       window.setTimeout(() => {
         window.location.assign(
-          `/pagamento?metodo=${encodeURIComponent(
-            selectedPayment
-          )}`
+          `/pagamento?metodo=${encodeURIComponent(selectedPayment)}`
         );
       }, 150);
     } catch (error) {
-      console.error(
-        "Erro ao preparar checkout:",
-        error
-      );
+      console.error("Erro ao preparar checkout:", error);
 
       toast.error("Não foi possível continuar", {
         description:
@@ -370,7 +620,7 @@ export default function CheckoutPage() {
 
   if (!mounted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{
@@ -378,53 +628,46 @@ export default function CheckoutPage() {
             repeat: Infinity,
             ease: "linear",
           }}
-          className="h-8 w-8 rounded-full border-2 border-white/10 border-t-white"
+          className="h-8 w-8 rounded-full border-2 border-zinc-200 border-t-black"
         />
       </div>
     );
   }
 
   /* ============================================================
-     CARRINHO VAZIO
+     EMPTY CART
      ============================================================ */
 
   if (items.length === 0) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-5 py-24 text-white sm:px-6">
+      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-5 py-24 text-black sm:px-6">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/4 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-white/[0.025] blur-3xl" />
-
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="absolute left-1/2 top-1/4 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-zinc-100 blur-3xl" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
         </div>
 
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 24,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: 0.5,
             ease: [0.22, 1, 0.36, 1],
           }}
           className="relative w-full max-w-xl text-center"
         >
-          <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] shadow-2xl">
+          <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50">
             <ShoppingBag
               size={38}
               strokeWidth={1.4}
-              className="text-white/30"
+              className="text-zinc-400"
             />
           </div>
 
-          <p className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-white/30">
+          <p className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-400">
             Checkout / Carrinho vazio
           </p>
 
-          <h1 className="text-[clamp(2.5rem,8vw,4.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-white">
+          <h1 className="text-[clamp(2.5rem,8vw,4.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-black">
             Nada por aqui.
           </h1>
 
@@ -436,7 +679,7 @@ export default function CheckoutPage() {
 
           <Link
             href="/collections"
-            className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-all duration-300 hover:scale-[1.03] hover:bg-zinc-200 active:scale-[0.98]"
+            className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-7 py-3.5 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all duration-300 hover:scale-[1.03] hover:bg-zinc-800 active:scale-[0.98]"
           >
             Começar a comprar
             <ChevronRight size={15} />
@@ -447,297 +690,127 @@ export default function CheckoutPage() {
   }
 
   /* ============================================================
-     PAYMENT METHOD MODAL
-
-     IMPORTANT:
-     This is a render function, NOT a React component.
-     Defining it this way prevents the modal/input tree from
-     being remounted every time formData changes.
+     PAYMENT MODAL
      ============================================================ */
 
-  const renderPaymentModal = () => {
-    return (
-      <AnimatePresence>
-        {paymentModalOpen && (
-          <>
-            {/* BACKDROP */}
-            <motion.button
-              type="button"
-              aria-label="Fechar seleção de pagamento"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closePaymentModal}
-              className="fixed inset-0 z-[90] cursor-default bg-black/80 backdrop-blur-md"
-            />
+  const renderPaymentModal = () => (
+    <AnimatePresence>
+      {paymentModalOpen && (
+        <>
+          <motion.button
+            type="button"
+            aria-label="Fechar seleção de pagamento"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closePaymentModal}
+            className="fixed inset-0 z-[90] cursor-default bg-black/45 backdrop-blur-sm"
+          />
 
-            {/* MODAL */}
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="payment-modal-title"
-              initial={{
-                opacity: 0,
-                y: 24,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              exit={{
-                opacity: 0,
-                y: 24,
-              }}
-              transition={{
-                duration: 0.25,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="fixed inset-x-0 bottom-0 z-[100] flex max-h-[94dvh] flex-col overflow-hidden rounded-t-[28px] border-t border-white/10 bg-[#080808] shadow-[0_-30px_100px_rgba(0,0,0,0.7)] sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-[min(580px,calc(100%-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[28px] sm:border"
-            >
-              {/* MOBILE HANDLE */}
-              <div className="shrink-0 pt-3 sm:hidden">
-                <div className="mx-auto h-1 w-10 rounded-full bg-white/10" />
-              </div>
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="payment-modal-title"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{
+              duration: 0.25,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="fixed inset-x-0 bottom-0 z-[100] flex max-h-[94dvh] flex-col overflow-hidden rounded-t-[26px] border-t border-zinc-200 bg-white shadow-[0_-25px_80px_rgba(0,0,0,0.15)] sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:w-[min(580px,calc(100%-32px))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[26px] sm:border"
+          >
+            <div className="shrink-0 pt-3 sm:hidden">
+              <div className="mx-auto h-1 w-10 rounded-full bg-zinc-200" />
+            </div>
 
-              {/* HEADER */}
-              <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-5 sm:px-7">
-                <div className="min-w-0">
-                  <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-white/25">
-                    Checkout / Pagamento
-                  </p>
+            <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-5 py-5 sm:px-7">
+              <div className="min-w-0">
+                <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-400">
+                  Checkout / Pagamento
+                </p>
 
-                  <h2
-                    id="payment-modal-title"
-                    className="mt-1 text-xl font-black uppercase tracking-tight text-white"
-                  >
-                    Método de pagamento
-                  </h2>
-
-                  <p className="mt-1 text-[10px] text-zinc-600">
-                    Escolha como pretende pagar.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={closePaymentModal}
-                  disabled={isProcessing}
-                  className="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-zinc-500 transition-colors hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                  aria-label="Fechar"
+                <h2
+                  id="payment-modal-title"
+                  className="mt-1 text-xl font-black uppercase tracking-tight text-black"
                 >
-                  <X size={17} />
-                </button>
+                  Método de pagamento
+                </h2>
+
+                <p className="mt-1 text-[10px] text-zinc-500">
+                  Escolha como pretende pagar.
+                </p>
               </div>
 
-              {/* METHODS */}
-              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-7 sm:py-6">
-                <div className="space-y-3">
-                  {paymentMethods.map((method) => {
-                    const Icon = method.icon;
-                    const isSelected =
-                      selectedPayment === method.id;
+              <button
+                type="button"
+                onClick={closePaymentModal}
+                disabled={isProcessing}
+                className="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Fechar"
+              >
+                <X size={17} />
+              </button>
+            </div>
 
-                    return (
-                      <button
-                        type="button"
-                        key={method.id}
-                        disabled={isProcessing}
-                        onClick={() =>
-                          setSelectedPayment(method.id)
-                        }
-                        className={`group w-full rounded-2xl border p-4 text-left transition-all duration-200 disabled:cursor-not-allowed ${
-                          isSelected
-                            ? "border-white/25 bg-white/[0.06]"
-                            : "border-white/8 bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.035]"
-                        }`}
-                      >
-                        <div className="flex items-start gap-3.5">
-                          {/* ICON */}
-                          <div
-                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all ${
-                              isSelected
-                                ? "bg-white text-black"
-                                : "bg-white/[0.05] text-zinc-500"
-                            }`}
-                          >
-                            <Icon size={18} />
-                          </div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-7 sm:py-6">
+              <PaymentOptions
+                selectedPayment={selectedPayment}
+                onSelect={setSelectedPayment}
+                disabled={isProcessing}
+                compact
+              />
+            </div>
 
-                          {/* CONTENT */}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <h3
-                                    className={`text-[12px] font-black uppercase tracking-tight ${
-                                      isSelected
-                                        ? "text-white"
-                                        : "text-zinc-300"
-                                    }`}
-                                  >
-                                    {method.title}
-                                  </h3>
+            <div className="shrink-0 border-t border-zinc-200 bg-zinc-50 p-5 pb-[calc(20px+env(safe-area-inset-bottom))] sm:p-7">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-[8px] font-bold uppercase tracking-[0.18em] text-zinc-500">
+                  Total
+                </span>
 
-                                  {method.badge && (
-                                    <span className="rounded-full border border-white/8 px-2 py-0.5 text-[6px] font-bold uppercase tracking-wider text-zinc-600">
-                                      {method.badge}
-                                    </span>
-                                  )}
-                                </div>
-
-                                <p className="mt-1 text-[9px] leading-5 text-zinc-600">
-                                  {method.description}
-                                </p>
-                              </div>
-
-                              {/* RADIO */}
-                              <div
-                                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                                  isSelected
-                                    ? "border-white bg-white"
-                                    : "border-white/20"
-                                }`}
-                              >
-                                {isSelected && (
-                                  <Check
-                                    size={11}
-                                    strokeWidth={3}
-                                    className="text-black"
-                                  />
-                                )}
-                              </div>
-                            </div>
-
-                            {/* PAYMENT IMAGES */}
-                            {method.images &&
-                              method.images.length > 0 && (
-                                <div className="mt-3 flex items-center gap-2">
-                                  {method.images
-                                    .slice(0, 3)
-                                    .map(
-                                      (
-                                        image,
-                                        imageIndex
-                                      ) => (
-                                        <div
-                                          key={`${method.id}-${imageIndex}`}
-                                          className="flex h-9 min-w-12 items-center justify-center overflow-hidden rounded-lg border border-white/8 bg-black/40 px-2"
-                                        >
-                                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                                          <img
-                                            src={image}
-                                            alt=""
-                                            className="max-h-5 max-w-10 object-contain opacity-70"
-                                          />
-                                        </div>
-                                      )
-                                    )}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-
-                        {/* DETAILS */}
-                        <AnimatePresence initial={false}>
-                          {isSelected && (
-                            <motion.div
-                              initial={{
-                                opacity: 0,
-                                height: 0,
-                              }}
-                              animate={{
-                                opacity: 1,
-                                height: "auto",
-                              }}
-                              exit={{
-                                opacity: 0,
-                                height: 0,
-                              }}
-                              transition={{
-                                duration: 0.2,
-                              }}
-                              className="overflow-hidden"
-                            >
-                              <div className="mt-4 border-t border-white/5 pt-3">
-                                <div className="flex gap-2.5 rounded-xl bg-black/30 p-3">
-                                  <Lock
-                                    size={13}
-                                    className="mt-0.5 shrink-0 text-white/30"
-                                  />
-
-                                  <p className="text-[9px] leading-5 text-zinc-600">
-                                    {method.details}
-                                  </p>
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </button>
-                    );
-                  })}
-                </div>
+                <span className="text-lg font-black text-black">
+                  {formatMZN(total)}
+                </span>
               </div>
 
-              {/* FOOTER */}
-              <div className="shrink-0 border-t border-white/10 bg-black/50 p-5 pb-[calc(20px+env(safe-area-inset-bottom))] sm:p-7">
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.18em] text-zinc-700">
-                    Total
-                  </span>
-
-                  <span className="text-lg font-black text-white">
-                    {formatMZN(total)}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  disabled={isProcessing}
-                  onClick={continueToPayment}
-                  className="group flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-zinc-200 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isProcessing ? (
-                    <>
-                      <motion.div
-                        animate={{
-                          rotate: 360,
-                        }}
-                        transition={{
-                          duration: 0.8,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        className="h-4 w-4 rounded-full border-2 border-black/20 border-t-black"
-                      />
-
-                      A preparar pagamento...
-                    </>
-                  ) : (
-                    <>
-                      Continuar para pagamento
-
-                      <ArrowRight
-                        size={15}
-                        className="transition-transform group-hover:translate-x-1"
-                      />
-                    </>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    );
-  };
+              <button
+                type="button"
+                disabled={isProcessing}
+                onClick={continueToPayment}
+                className="group flex min-h-[56px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isProcessing ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white"
+                    />
+                    A preparar pagamento...
+                  </>
+                ) : (
+                  <>
+                    Continuar para pagamento
+                    <ArrowRight
+                      size={15}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
 
   /* ============================================================
-     MOBILE
-
-     IMPORTANT:
-     Render function instead of nested component.
-     This prevents inputs from being remounted on every keystroke.
+     MOBILE CHECKOUT
      ============================================================ */
 
   const renderMobileCheckout = () => {
@@ -745,33 +818,31 @@ export default function CheckoutPage() {
 
     return (
       <div className="block lg:hidden">
-        {/* TOP BAR */}
         <div className="mb-7 flex items-center justify-between">
           <Link
             href="/collections"
-            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-3.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45"
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-600 transition-colors hover:border-black hover:text-black"
           >
             <ArrowLeft size={14} />
             Voltar
           </Link>
 
-          <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-wider text-white/25">
+          <div className="flex items-center gap-2 text-[8px] font-bold uppercase tracking-wider text-zinc-400">
             <Lock size={11} />
-            Seguro
+            Checkout seguro
           </div>
         </div>
 
-        {/* HERO */}
         <div className="mb-7">
           <div className="mb-4 flex items-center gap-3">
-            <div className="h-px w-7 bg-white/20" />
+            <div className="h-px w-7 bg-black/30" />
 
-            <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-white/30">
+            <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-400">
               Tanosi / Checkout
             </p>
           </div>
 
-          <h1 className="text-[clamp(2.7rem,13vw,4.4rem)] font-black uppercase leading-[0.86] tracking-[-0.065em]">
+          <h1 className="text-[clamp(2.7rem,13vw,4.4rem)] font-black uppercase leading-[0.86] tracking-[-0.065em] text-black">
             {isDetailsStep ? (
               <>
                 Os seus
@@ -787,29 +858,24 @@ export default function CheckoutPage() {
             )}
           </h1>
 
-          <p className="mt-4 max-w-sm text-[12px] leading-6 text-zinc-600">
+          <p className="mt-4 max-w-sm text-[12px] leading-6 text-zinc-500">
             {isDetailsStep
               ? "Introduza os seus dados para prepararmos a entrega."
               : "Confirme a sua encomenda antes de escolher o método de pagamento."}
           </p>
         </div>
 
-        {/* PROGRESSO */}
         <div className="mb-7">
           <div className="grid grid-cols-2 gap-1.5">
             <div
               className={`h-1 rounded-full transition-colors duration-300 ${
-                isDetailsStep
-                  ? "bg-white"
-                  : "bg-white/20"
+                isDetailsStep ? "bg-black" : "bg-zinc-200"
               }`}
             />
 
             <div
               className={`h-1 rounded-full transition-colors duration-300 ${
-                !isDetailsStep
-                  ? "bg-white"
-                  : "bg-white/10"
+                !isDetailsStep ? "bg-black" : "bg-zinc-200"
               }`}
             />
           </div>
@@ -817,9 +883,7 @@ export default function CheckoutPage() {
           <div className="mt-2 flex justify-between">
             <span
               className={`text-[7px] font-bold uppercase tracking-[0.18em] ${
-                isDetailsStep
-                  ? "text-white"
-                  : "text-white/30"
+                isDetailsStep ? "text-black" : "text-zinc-400"
               }`}
             >
               01 / Dados
@@ -827,9 +891,7 @@ export default function CheckoutPage() {
 
             <span
               className={`text-[7px] font-bold uppercase tracking-[0.18em] ${
-                !isDetailsStep
-                  ? "text-white"
-                  : "text-white/30"
+                !isDetailsStep ? "text-black" : "text-zinc-400"
               }`}
             >
               02 / Resumo
@@ -837,105 +899,61 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* STEP CONTENT */}
-        <AnimatePresence
-          mode="wait"
-          initial={false}
-        >
+        <AnimatePresence mode="wait" initial={false}>
           {isDetailsStep ? (
             <motion.div
               key="mobile-dados"
-              initial={{
-                opacity: 0,
-                x: -12,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              exit={{
-                opacity: 0,
-                x: -12,
-              }}
-              transition={{
-                duration: 0.2,
-                ease: "easeOut",
-              }}
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              {/* DADOS */}
-              <section className="overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.025]">
-                <div className="border-b border-white/10 px-5 py-5">
-                  <div className="flex items-center gap-3.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
-                      <MapPin
-                        size={18}
-                        className="text-white"
-                      />
-                    </div>
+              <section className={sectionClassName}>
+                <SectionHeading
+                  icon={MapPin}
+                  title="Dados de entrega"
+                  description="Onde devemos entregar?"
+                  number="01"
+                />
 
-                    <div>
-                      <h2 className="text-[14px] font-black uppercase tracking-tight">
-                        Dados de entrega
-                      </h2>
-
-                      <p className="mt-1 text-[10px] text-zinc-600">
-                        Onde devemos entregar?
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-5 p-5">
-                  {/* NOME */}
-                  <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="mobile-firstName"
-                        className={labelClassName}
-                      >
-                        <User size={11} />
-                        Nome
-                      </label>
-
-                      <input
-                        id="mobile-firstName"
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        placeholder="João"
-                        autoComplete="given-name"
-                        className={inputClassName}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="mobile-lastName"
-                        className={labelClassName}
-                      >
-                        Apelido
-                      </label>
-
-                      <input
-                        id="mobile-lastName"
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Manuel"
-                        autoComplete="family-name"
-                        className={inputClassName}
-                      />
-                    </div>
-                  </div>
-
-                  {/* EMAIL */}
+                <div className="space-y-5 p-5 sm:p-6">
                   <div className="space-y-2">
-                    <label
-                      htmlFor="mobile-email"
-                      className={labelClassName}
-                    >
+                    <label htmlFor="mobile-firstName" className={labelClassName}>
+                      <User size={11} />
+                      Nome
+                    </label>
+
+                    <input
+                      id="mobile-firstName"
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      placeholder="João"
+                      autoComplete="given-name"
+                      className={inputClassName}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="mobile-lastName" className={labelClassName}>
+                      Apelido
+                    </label>
+
+                    <input
+                      id="mobile-lastName"
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      placeholder="Manuel"
+                      autoComplete="family-name"
+                      className={inputClassName}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="mobile-email" className={labelClassName}>
                       <Mail size={11} />
                       E-mail
                     </label>
@@ -952,12 +970,8 @@ export default function CheckoutPage() {
                     />
                   </div>
 
-                  {/* MORADA */}
                   <div className="space-y-2">
-                    <label
-                      htmlFor="mobile-address"
-                      className={labelClassName}
-                    >
+                    <label htmlFor="mobile-address" className={labelClassName}>
                       <Home size={11} />
                       Morada
                     </label>
@@ -976,14 +990,12 @@ export default function CheckoutPage() {
                 </div>
               </section>
 
-              {/* CONTINUAR */}
               <button
                 type="button"
                 onClick={handleMobileContinue}
-                className="group mt-4 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-all active:scale-[0.985]"
+                className="group mt-4 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985]"
               >
                 Ver resumo
-
                 <ArrowRight
                   size={15}
                   className="transition-transform group-hover:translate-x-1"
@@ -993,241 +1005,116 @@ export default function CheckoutPage() {
           ) : (
             <motion.div
               key="mobile-resumo"
-              initial={{
-                opacity: 0,
-                x: 12,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              exit={{
-                opacity: 0,
-                x: 12,
-              }}
-              transition={{
-                duration: 0.2,
-                ease: "easeOut",
-              }}
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 12 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
             >
-              {/* RESUMO */}
-              <section className="overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.025]">
-                <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
+              <section className={sectionClassName}>
+                <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-5">
                   <div>
-                    <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-white/25">
+                    <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-400">
                       Encomenda
                     </p>
 
-                    <h2 className="mt-1 text-xl font-black uppercase tracking-tight">
+                    <h2 className="mt-1 text-xl font-black uppercase tracking-tight text-black">
                       Resumo
                     </h2>
                   </div>
 
-                  <div className="flex h-9 min-w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-2 text-[9px] font-black text-white/50">
+                  <div className="flex h-9 min-w-9 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 px-2 text-[9px] font-black text-zinc-600">
                     {totalItems}
                   </div>
                 </div>
 
-                {/* PRODUTOS */}
-                <div className="space-y-4 p-5">
-                  {items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex gap-3.5"
-                    >
-                      <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-white/[0.04]">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={
-                            item.image ||
-                            "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=80"
-                          }
-                          alt={item.name}
-                          className="h-full w-full object-cover"
-                        />
+                <OrderItems items={items} compact />
 
-                        <div className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-black/75 px-1 text-[8px] font-bold text-white">
-                          {item.quantity}
-                        </div>
-                      </div>
-
-                      <div className="flex min-w-0 flex-1 flex-col justify-between">
-                        <div>
-                          <h3 className="line-clamp-2 text-[12px] font-bold leading-[1.3] text-white">
-                            {item.name}
-                          </h3>
-
-                          <p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-zinc-700">
-                            Quantidade / {item.quantity}
-                          </p>
-                        </div>
-
-                        <p className="text-[12px] font-bold text-white">
-                          {formatMZN(
-                            item.price * item.quantity
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* TOTAIS */}
-                <div className="border-t border-white/10 p-5">
-                  <div className="space-y-3 text-[11px]">
-                    <div className="flex justify-between">
-                      <span className="text-zinc-600">
-                        Subtotal
-                      </span>
-
-                      <span className="text-zinc-300">
-                        {formatMZN(subtotal)}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-zinc-600">
-                        Entrega
-                      </span>
-
-                      <span className="text-zinc-300">
-                        {formatMZN(shipping)}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-zinc-600">
-                        Impostos
-                      </span>
-
-                      <span className="text-zinc-300">
-                        {formatMZN(taxes)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="my-5 h-px bg-white/10" />
-
-                  <div className="flex items-end justify-between gap-4">
-                    <div>
-                      <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-600">
-                        Total
-                      </p>
-
-                      <p className="mt-1 text-[29px] font-black leading-none tracking-[-0.05em]">
-                        {formatMZN(total)}
-                      </p>
-                    </div>
-
-                    <span className="rounded-full border border-white/10 px-2.5 py-1 text-[7px] font-bold uppercase tracking-widest text-zinc-600">
-                      MZN
-                    </span>
-                  </div>
-                </div>
+                <OrderTotals
+                  subtotal={subtotal}
+                  shipping={shipping}
+                  taxes={taxes}
+                  total={total}
+                  compact
+                />
               </section>
 
-              {/* DADOS DO CLIENTE */}
-              <section className="mt-4 rounded-[24px] border border-white/10 bg-white/[0.025] p-5">
+              <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-700">
+                    <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-400">
                       Entrega
                     </p>
 
-                    <h3 className="mt-1 truncate text-[12px] font-black uppercase">
-                      {formData.firstName}{" "}
-                      {formData.lastName}
+                    <h3 className="mt-1 truncate text-[12px] font-black uppercase text-black">
+                      {formData.firstName} {formData.lastName}
                     </h3>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleMobileBack}
-                    className="shrink-0 text-[8px] font-bold uppercase tracking-wider text-white/40 underline underline-offset-4"
+                    className="shrink-0 text-[8px] font-bold uppercase tracking-wider text-zinc-500 underline underline-offset-4 transition-colors hover:text-black"
                   >
                     Alterar
                   </button>
                 </div>
 
-                <div className="space-y-1 text-[10px] leading-5 text-zinc-600">
+                <div className="space-y-1 text-[10px] leading-5 text-zinc-500">
                   <p>{formData.address}</p>
-
-                  <p className="break-all">
-                    {formData.email}
-                  </p>
+                  <p className="break-all">{formData.email}</p>
                 </div>
               </section>
 
-              {/* PAGAR AGORA */}
               <button
                 type="button"
                 onClick={openPaymentModal}
-                className="group mt-4 flex min-h-[60px] w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-all active:scale-[0.985]"
+                className="group mt-4 flex min-h-[60px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985]"
               >
                 Pagar agora
-
                 <ArrowRight
                   size={15}
                   className="transition-transform group-hover:translate-x-1"
                 />
               </button>
 
-              {/* VOLTAR */}
               <button
                 type="button"
                 onClick={handleMobileBack}
-                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-600"
+                className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-colors hover:text-black"
               >
                 <ChevronLeft size={13} />
                 Voltar aos dados
               </button>
 
-              <div className="mt-4 flex items-start gap-2.5 text-[8px] leading-5 text-zinc-700">
-                <Lock
-                  size={11}
-                  className="mt-0.5 shrink-0"
-                />
+              <div className="mt-4 flex items-start gap-2.5 text-[8px] leading-5 text-zinc-400">
+                <Lock size={11} className="mt-0.5 shrink-0" />
 
                 <p>
-                  Os seus dados são utilizados apenas para
-                  processar a encomenda. Depois de escolher o
-                  método, será redirecionado para a página de
-                  pagamento.
+                  Os seus dados são utilizados apenas para processar a
+                  encomenda. Depois de escolher o método, será redirecionado
+                  para a página de pagamento.
                 </p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* BENEFÍCIOS */}
         <div className="mt-5 grid grid-cols-3 gap-2">
           {[
-            {
-              icon: ShieldCheck,
-              title: "Seguro",
-            },
-            {
-              icon: PackageCheck,
-              title: "Acompanhado",
-            },
-            {
-              icon: Sparkles,
-              title: "Tanosi",
-            },
+            { icon: ShieldCheck, title: "Seguro" },
+            { icon: PackageCheck, title: "Acompanhado" },
+            { icon: Sparkles, title: "Tanosi" },
           ].map((item) => {
             const Icon = item.icon;
 
             return (
               <div
                 key={item.title}
-                className="rounded-2xl border border-white/5 bg-white/[0.018] p-3"
+                className="rounded-xl border border-zinc-200 bg-white p-3"
               >
-                <Icon
-                  size={14}
-                  className="text-white/25"
-                />
+                <Icon size={14} className="text-zinc-500" />
 
-                <p className="mt-2 text-[7px] font-black uppercase tracking-[0.14em] text-white/40">
+                <p className="mt-2 text-[7px] font-black uppercase tracking-[0.14em] text-zinc-600">
                   {item.title}
                 </p>
               </div>
@@ -1235,25 +1122,21 @@ export default function CheckoutPage() {
           })}
         </div>
 
-        {/* MODAL */}
         {renderPaymentModal()}
       </div>
     );
   };
 
   /* ============================================================
-     DESKTOP
-
-     Render function instead of nested component.
+     DESKTOP CHECKOUT
      ============================================================ */
 
   const renderDesktopCheckout = () => (
     <div className="hidden lg:block">
-      {/* TOP BAR */}
       <div className="mb-10 flex items-center justify-between">
         <Link
           href="/collections"
-          className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-4 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45 transition-all hover:border-white/10 hover:bg-white/[0.05] hover:text-white"
+          className="group inline-flex min-h-10 items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-500 transition-all hover:border-black hover:text-black"
         >
           <ArrowLeft
             size={14}
@@ -1262,99 +1145,55 @@ export default function CheckoutPage() {
           Voltar às compras
         </Link>
 
-        <div className="flex items-center gap-2 rounded-full border border-white/5 bg-white/[0.02] px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.18em] text-white/30">
+        <div className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3.5 py-2 text-[8px] font-bold uppercase tracking-[0.18em] text-zinc-500">
           <Lock size={11} />
           Checkout seguro
         </div>
       </div>
 
-      {/* STEPS */}
       <div className="mb-12 flex items-center gap-3 text-[9px] font-bold uppercase tracking-[0.15em]">
-        <span className="text-white">
-          Carrinho
-        </span>
-
-        <ChevronRight
-          size={12}
-          className="text-white/20"
-        />
-
-        <span className="text-white">
-          Checkout
-        </span>
-
-        <ChevronRight
-          size={12}
-          className="text-white/20"
-        />
-
-        <span className="text-white/20">
-          Pagamento
-        </span>
+        <span className="text-black">Carrinho</span>
+        <ChevronRight size={12} className="text-zinc-300" />
+        <span className="text-black">Checkout</span>
+        <ChevronRight size={12} className="text-zinc-300" />
+        <span className="text-zinc-400">Pagamento</span>
       </div>
 
-      {/* HERO */}
       <div className="mb-12 max-w-3xl">
         <div className="mb-4 flex items-center gap-3">
-          <div className="h-px w-8 bg-white/20" />
+          <div className="h-px w-8 bg-black/30" />
 
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-white/30">
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-400">
             Tanosi / Checkout
           </p>
         </div>
 
-        <h1 className="text-[clamp(3rem,6vw,5.75rem)] font-black uppercase leading-[0.88] tracking-[-0.065em]">
+        <h1 className="text-[clamp(3rem,6vw,5.75rem)] font-black uppercase leading-[0.88] tracking-[-0.065em] text-black">
           Finalize a sua
           <br />
           encomenda.
         </h1>
 
         <p className="mt-5 max-w-xl text-sm leading-7 text-zinc-500">
-          Preencha os seus dados de entrega, escolha o
-          método de pagamento e continue para concluir a
-          sua compra de forma segura.
+          Preencha os seus dados de entrega, escolha o método de pagamento
+          e continue para concluir a sua compra.
         </p>
       </div>
 
       <div className="grid grid-cols-12 items-start gap-8 xl:gap-10">
-        {/* LEFT */}
         <div className="col-span-7 space-y-5">
-          {/* DADOS */}
-          <section className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.025] shadow-[0_20px_80px_rgba(0,0,0,0.25)]">
-            <div className="border-b border-white/10 px-7 py-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
-                  <MapPin
-                    size={18}
-                    className="text-white"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-black uppercase tracking-tight">
-                      Dados de entrega
-                    </h2>
-
-                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[7px] font-bold uppercase tracking-wider text-white/30">
-                      01
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-xs text-zinc-600">
-                    Para onde devemos enviar a sua encomenda?
-                  </p>
-                </div>
-              </div>
-            </div>
+          <section className={sectionClassName}>
+            <SectionHeading
+              icon={MapPin}
+              title="Dados de entrega"
+              description="Para onde devemos enviar a sua encomenda?"
+              number="01"
+            />
 
             <div className="space-y-6 p-7">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label
-                    htmlFor="desktop-firstName"
-                    className={labelClassName}
-                  >
+                  <label htmlFor="desktop-firstName" className={labelClassName}>
                     <User size={11} />
                     Nome
                   </label>
@@ -1372,10 +1211,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label
-                    htmlFor="desktop-lastName"
-                    className={labelClassName}
-                  >
+                  <label htmlFor="desktop-lastName" className={labelClassName}>
                     Apelido
                   </label>
 
@@ -1393,10 +1229,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="desktop-email"
-                  className={labelClassName}
-                >
+                <label htmlFor="desktop-email" className={labelClassName}>
                   <Mail size={11} />
                   Endereço de e-mail
                 </label>
@@ -1414,10 +1247,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="desktop-address"
-                  className={labelClassName}
-                >
+                <label htmlFor="desktop-address" className={labelClassName}>
                   <Home size={11} />
                   Morada
                 </label>
@@ -1436,151 +1266,22 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* PAGAMENTO */}
-          <section className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.025] shadow-[0_20px_80px_rgba(0,0,0,0.25)]">
-            <div className="flex items-center justify-between border-b border-white/10 px-7 py-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
-                  <ShieldCheck
-                    size={19}
-                    className="text-white"
-                  />
-                </div>
+          <section className={sectionClassName}>
+            <SectionHeading
+              icon={ShieldCheck}
+              title="Pagamento"
+              description="Selecione como pretende pagar."
+              number="02"
+            />
 
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-black uppercase tracking-tight">
-                      Pagamento
-                    </h2>
-
-                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[7px] font-bold uppercase tracking-wider text-white/30">
-                      02
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-xs text-zinc-600">
-                    Selecione como pretende pagar.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[7px] font-bold uppercase tracking-widest text-zinc-500">
-                <Lock size={10} />
-                Seguro
-              </div>
-            </div>
-
-            <div className="space-y-3 p-7">
-              {paymentMethods.map((method) => {
-                const Icon = method.icon;
-                const isSelected =
-                  selectedPayment === method.id;
-
-                return (
-                  <button
-                    type="button"
-                    key={method.id}
-                    onClick={() =>
-                      setSelectedPayment(method.id)
-                    }
-                    className={`w-full rounded-2xl border p-5 text-left transition-all duration-300 ${
-                      isSelected
-                        ? "border-white/25 bg-white/[0.055]"
-                        : "border-white/7 bg-black/20 hover:border-white/15 hover:bg-white/[0.025]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                          isSelected
-                            ? "bg-white text-black"
-                            : "bg-white/[0.045] text-zinc-500"
-                        }`}
-                      >
-                        <Icon size={19} />
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p
-                            className={`text-sm font-black uppercase tracking-tight ${
-                              isSelected
-                                ? "text-white"
-                                : "text-zinc-300"
-                            }`}
-                          >
-                            {method.title}
-                          </p>
-
-                          {method.badge && (
-                            <span className="rounded-full border border-white/8 px-2 py-0.5 text-[7px] font-bold uppercase tracking-wider text-zinc-600">
-                              {method.badge}
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="mt-1 text-[11px] text-zinc-600">
-                          {method.description}
-                        </p>
-
-                        {method.images &&
-                          method.images.length > 0 && (
-                            <div className="mt-3 flex gap-2">
-                              {method.images
-                                .slice(0, 3)
-                                .map(
-                                  (
-                                    image,
-                                    index
-                                  ) => (
-                                    <div
-                                      key={`${method.id}-${index}`}
-                                      className="flex h-8 min-w-11 items-center justify-center rounded-lg border border-white/8 bg-black/30 px-2"
-                                    >
-                                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img
-                                        src={image}
-                                        alt=""
-                                        className="max-h-4 max-w-9 object-contain opacity-60"
-                                      />
-                                    </div>
-                                  )
-                                )}
-                            </div>
-                          )}
-                      </div>
-
-                      <div
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                          isSelected
-                            ? "border-white bg-white"
-                            : "border-white/20"
-                        }`}
-                      >
-                        {isSelected && (
-                          <Check
-                            size={11}
-                            strokeWidth={3}
-                            className="text-black"
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    {isSelected && (
-                      <div className="mt-4 border-t border-white/5 pt-4">
-                        <p className="text-[10px] leading-5 text-zinc-600">
-                          {method.details}
-                        </p>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
+            <div className="p-5 sm:p-7">
+              <PaymentOptions
+                selectedPayment={selectedPayment}
+                onSelect={setSelectedPayment}
+              />
             </div>
           </section>
 
-          {/* BENEFÍCIOS */}
           <div className="grid grid-cols-3 gap-2.5">
             {[
               {
@@ -1604,20 +1305,17 @@ export default function CheckoutPage() {
               return (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-white/5 bg-white/[0.018] p-4"
+                  className="rounded-xl border border-zinc-200 bg-white p-4"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.035]">
-                    <Icon
-                      size={15}
-                      className="text-white/30"
-                    />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50">
+                    <Icon size={15} className="text-zinc-600" />
                   </div>
 
-                  <p className="mt-3 text-[8px] font-black uppercase tracking-[0.16em] text-white/50">
+                  <p className="mt-3 text-[8px] font-black uppercase tracking-[0.16em] text-zinc-700">
                     {item.title}
                   </p>
 
-                  <p className="mt-1 text-[9px] text-zinc-700">
+                  <p className="mt-1 text-[9px] text-zinc-400">
                     {item.text}
                   </p>
                 </div>
@@ -1626,140 +1324,48 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* RIGHT — RESUMO */}
         <div className="col-span-5">
           <div className="sticky top-24">
-            <section className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.035] shadow-[0_30px_100px_rgba(0,0,0,0.4)]">
-              <div className="border-b border-white/10 px-7 py-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-white/25">
-                      Encomenda
-                    </p>
+            <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_15px_55px_rgba(0,0,0,0.06)]">
+              <div className="flex items-center justify-between border-b border-zinc-200 px-7 py-6">
+                <div>
+                  <p className="font-mono text-[8px] font-bold uppercase tracking-[0.3em] text-zinc-400">
+                    Encomenda
+                  </p>
 
-                    <h2 className="mt-1 text-xl font-black uppercase tracking-tight">
-                      Resumo
-                    </h2>
-                  </div>
+                  <h2 className="mt-1 text-xl font-black uppercase tracking-tight text-black">
+                    Resumo
+                  </h2>
+                </div>
 
-                  <div className="flex h-9 min-w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-2 text-[9px] font-black text-white/50">
-                    {totalItems}
-                  </div>
+                <div className="flex h-9 min-w-9 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 px-2 text-[9px] font-black text-zinc-600">
+                  {totalItems}
                 </div>
               </div>
 
-              <div className="max-h-[440px] space-y-5 overflow-y-auto p-7">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex gap-4"
-                  >
-                    <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-white/[0.04]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={
-                          item.image ||
-                          "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=80"
-                        }
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
+              <OrderItems items={items} />
 
-                      <div className="absolute right-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-black/75 px-1 text-[8px] font-bold text-white">
-                        {item.quantity}
-                      </div>
-                    </div>
+              <OrderTotals
+                subtotal={subtotal}
+                shipping={shipping}
+                taxes={taxes}
+                total={total}
+              />
 
-                    <div className="flex min-w-0 flex-1 flex-col justify-between">
-                      <div>
-                        <h3 className="line-clamp-2 text-sm font-bold leading-[1.3] text-white">
-                          {item.name}
-                        </h3>
-
-                        <p className="mt-1 text-[9px] uppercase tracking-[0.16em] text-zinc-700">
-                          Quantidade / {item.quantity}
-                        </p>
-                      </div>
-
-                      <p className="text-sm font-bold text-white">
-                        {formatMZN(
-                          item.price * item.quantity
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-white/10 px-7 py-7">
-                <div className="space-y-3.5 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-zinc-600">
-                      Subtotal
-                    </span>
-
-                    <span className="text-zinc-300">
-                      {formatMZN(subtotal)}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-zinc-600">
-                      Entrega
-                    </span>
-
-                    <span className="text-zinc-300">
-                      {formatMZN(shipping)}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span className="text-zinc-600">
-                      Impostos
-                    </span>
-
-                    <span className="text-zinc-300">
-                      {formatMZN(taxes)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="my-6 h-px bg-white/10" />
-
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-600">
-                      Total da encomenda
-                    </p>
-
-                    <p className="mt-1 text-3xl font-black tracking-[-0.05em]">
-                      {formatMZN(total)}
-                    </p>
-                  </div>
-
-                  <span className="rounded-full border border-white/10 px-2.5 py-1 text-[7px] font-bold uppercase tracking-widest text-zinc-600">
-                    MZN
-                  </span>
-                </div>
-
-                <div className="mt-6 rounded-2xl border border-white/5 bg-black/25 p-4">
+              <div className="px-7 pb-7">
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[7px] font-bold uppercase tracking-[0.18em] text-zinc-700">
-                        Pagamento
+                      <p className="text-[7px] font-bold uppercase tracking-[0.18em] text-zinc-400">
+                        Método de pagamento
                       </p>
 
-                      <p className="mt-1 text-[10px] font-bold text-zinc-300">
-                        {getPaymentLabel(
-                          selectedPayment
-                        )}
+                      <p className="mt-1 text-[10px] font-bold text-black">
+                        {getPaymentLabel(selectedPayment)}
                       </p>
                     </div>
 
-                    <Check
-                      size={14}
-                      className="text-white/40"
-                    />
+                    <Check size={14} className="text-zinc-500" />
                   </div>
                 </div>
 
@@ -1767,28 +1373,24 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={continueToPayment}
                   disabled={isProcessing}
-                  className="group mt-5 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-2xl bg-white px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-zinc-200 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="group mt-5 flex min-h-[58px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>
                       <motion.div
-                        animate={{
-                          rotate: 360,
-                        }}
+                        animate={{ rotate: 360 }}
                         transition={{
                           duration: 0.8,
                           repeat: Infinity,
                           ease: "linear",
                         }}
-                        className="h-4 w-4 rounded-full border-2 border-black/20 border-t-black"
+                        className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white"
                       />
-
                       A preparar pagamento...
                     </>
                   ) : (
                     <>
-                      Selecionar método
-
+                      Continuar para pagamento
                       <ArrowRight
                         size={15}
                         className="transition-transform group-hover:translate-x-1"
@@ -1797,24 +1399,20 @@ export default function CheckoutPage() {
                   )}
                 </button>
 
-                <div className="mt-5 flex items-start gap-2.5 text-[9px] leading-5 text-zinc-700">
-                  <Lock
-                    size={11}
-                    className="mt-0.5 shrink-0"
-                  />
+                <div className="mt-5 flex items-start gap-2.5 text-[9px] leading-5 text-zinc-400">
+                  <Lock size={11} className="mt-0.5 shrink-0" />
 
                   <p>
-                    Os seus dados são utilizados apenas para
-                    processar a encomenda. O pagamento será
-                    concluído numa página segura.
+                    Os seus dados são utilizados apenas para processar a
+                    encomenda. O pagamento será concluído na página seguinte.
                   </p>
                 </div>
               </div>
             </section>
 
-            <div className="mt-3 flex items-center justify-center gap-2 text-[8px] font-bold uppercase tracking-[0.15em] text-zinc-700">
+            <div className="mt-3 flex items-center justify-center gap-2 text-[8px] font-bold uppercase tracking-[0.15em] text-zinc-400">
               <ShieldCheck size={12} />
-              Pagamento seguro
+              Checkout seguro
             </div>
           </div>
         </div>
@@ -1823,16 +1421,15 @@ export default function CheckoutPage() {
   );
 
   /* ============================================================
-     PÁGINA
+     PAGE
      ============================================================ */
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-black text-white">
-      {/* BACKGROUND */}
+    <main className="min-h-screen overflow-x-hidden bg-[#fafafa] text-black">
       <div className="pointer-events-none fixed inset-0 -z-0">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
 
-        <div className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-white/[0.018] blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-zinc-100/80 blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 pb-16 pt-24 sm:px-6 sm:pb-24 lg:px-10 xl:px-12">
@@ -1842,7 +1439,6 @@ export default function CheckoutPage() {
 
       <Footer />
 
-      {/* AUTOFILL */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -1850,16 +1446,17 @@ export default function CheckoutPage() {
             input:-webkit-autofill:hover,
             input:-webkit-autofill:focus,
             input:-webkit-autofill:active {
-              -webkit-text-fill-color: white;
+              -webkit-text-fill-color: #09090b;
+              box-shadow: 0 0 0px 1000px white inset;
               transition: background-color 9999s ease-in-out 0s;
             }
 
             html {
-              background: #000;
+              background: #fafafa;
             }
 
             body {
-              background: #000;
+              background: #fafafa;
             }
           `,
         }}

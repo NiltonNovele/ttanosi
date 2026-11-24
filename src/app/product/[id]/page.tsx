@@ -49,6 +49,7 @@ export default function ProductDetailPage({
     : ["/placeholder.jpg"];
 
   const hasSizes = Boolean(product.sizes?.length);
+  const hasMultipleImages = images.length > 1;
 
   React.useEffect(() => {
     setSelectedSize(product.sizes?.length === 1 ? product.sizes[0] : null);
@@ -157,10 +158,7 @@ export default function ProductDetailPage({
             aria-label="Navegação estrutural"
             className="hidden items-center gap-3 text-[9px] font-medium uppercase tracking-[0.16em] text-zinc-400 sm:flex"
           >
-            <Link
-              href="/"
-              className="transition-colors hover:text-black"
-            >
+            <Link href="/" className="transition-colors hover:text-black">
               Início
             </Link>
 
@@ -203,10 +201,16 @@ export default function ProductDetailPage({
           {/* PRODUCT GALLERY */}
 
           <section className="min-w-0 lg:sticky lg:top-24">
-            <div className="grid gap-3 sm:grid-cols-[64px_minmax(0,1fr)] lg:grid-cols-[72px_minmax(0,1fr)]">
+            <div
+              className={
+                hasMultipleImages
+                  ? "grid grid-cols-1 gap-3 sm:grid-cols-[64px_minmax(0,1fr)] lg:grid-cols-[72px_minmax(0,1fr)]"
+                  : "grid grid-cols-1"
+              }
+            >
               {/* THUMBNAILS */}
 
-              {images.length > 1 && (
+              {hasMultipleImages && (
                 <div className="order-2 flex gap-2 overflow-x-auto pb-1 scrollbar-none sm:order-1 sm:flex-col sm:overflow-visible">
                   {images.map((image, index) => {
                     const active = activeImage === index;
@@ -244,9 +248,13 @@ export default function ProductDetailPage({
                   duration: 0.5,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="group relative order-1 min-w-0 overflow-hidden bg-[#f4f4f2] sm:order-2"
+                className={`group relative min-w-0 overflow-hidden bg-[#f4f4f2] ${
+                  hasMultipleImages
+                    ? "order-1 sm:order-2"
+                    : "order-1 w-full"
+                }`}
               >
-                <div className="relative aspect-[4/5] w-full max-h-[780px]">
+                <div className="relative aspect-[4/5] max-h-[min(78vh,850px)] w-full overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={`${images[activeImage]}-${activeImage}`}
@@ -256,14 +264,14 @@ export default function ProductDetailPage({
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.015]"
+                      className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.015]"
                     />
                   </AnimatePresence>
 
                   {/* PRODUCT LABEL */}
 
                   {(product.isNewArrival || product.badge) && (
-                    <div className="absolute left-4 top-4 sm:left-5 sm:top-5">
+                    <div className="absolute left-4 top-4 z-10 sm:left-5 sm:top-5">
                       <span className="inline-flex items-center gap-2 bg-white px-3 py-2 text-[8px] font-bold uppercase tracking-[0.16em] text-black">
                         <span className="h-1.5 w-1.5 rounded-full bg-black" />
                         {product.badge || "Novidade"}
@@ -273,13 +281,13 @@ export default function ProductDetailPage({
 
                   {/* IMAGE NAVIGATION */}
 
-                  {images.length > 1 && (
+                  {hasMultipleImages && (
                     <>
                       <button
                         type="button"
                         onClick={previousImage}
                         aria-label="Imagem anterior"
-                        className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/80 text-black opacity-100 backdrop-blur-sm transition-all hover:bg-black hover:text-white sm:left-5"
+                        className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/80 text-black backdrop-blur-sm transition-all hover:bg-black hover:text-white sm:left-5"
                       >
                         <ChevronLeft className="h-4 w-4" />
                       </button>
@@ -288,12 +296,12 @@ export default function ProductDetailPage({
                         type="button"
                         onClick={nextImage}
                         aria-label="Imagem seguinte"
-                        className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/80 text-black opacity-100 backdrop-blur-sm transition-all hover:bg-black hover:text-white sm:right-5"
+                        className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/80 text-black backdrop-blur-sm transition-all hover:bg-black hover:text-white sm:right-5"
                       >
                         <ChevronRight className="h-4 w-4" />
                       </button>
 
-                      <div className="absolute bottom-4 right-4 bg-white/90 px-3 py-1.5 font-mono text-[9px] tracking-wider text-black backdrop-blur-sm">
+                      <div className="absolute bottom-4 right-4 z-10 bg-white/90 px-3 py-1.5 font-mono text-[9px] tracking-wider text-black backdrop-blur-sm">
                         {String(activeImage + 1).padStart(2, "0")}
                         <span className="mx-1.5 text-zinc-400">/</span>
                         {String(images.length).padStart(2, "0")}
@@ -306,7 +314,7 @@ export default function ProductDetailPage({
 
             {/* MOBILE IMAGE INDICATORS */}
 
-            {images.length > 1 && (
+            {hasMultipleImages && (
               <div className="mt-4 flex justify-center gap-1.5 sm:hidden">
                 {images.map((_, index) => (
                   <button
@@ -506,6 +514,85 @@ export default function ProductDetailPage({
                 </button>
               </div>
 
+              {/* SERVICE INFORMATION */}
+
+              <div className="grid grid-cols-1 border-b border-zinc-200 sm:grid-cols-3">
+                <div className="flex items-center gap-3 border-b border-zinc-100 py-4 sm:flex-col sm:items-start sm:border-b-0 sm:px-3 sm:py-5 sm:first:pl-0">
+                  <Truck className="h-4 w-4 shrink-0 text-zinc-500" />
+
+                  <div>
+                    <p className="text-[8px] font-bold uppercase tracking-[0.15em]">
+                      Envio
+                    </p>
+                    <p className="mt-1 text-[9px] text-zinc-500">
+                      Preparação cuidada
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 border-b border-zinc-100 py-4 sm:flex-col sm:items-start sm:border-b-0 sm:border-l sm:border-zinc-200 sm:px-3 sm:py-5">
+                  <RotateCcw className="h-4 w-4 shrink-0 text-zinc-500" />
+
+                  <div>
+                    <p className="text-[8px] font-bold uppercase tracking-[0.15em]">
+                      Devoluções
+                    </p>
+                    <p className="mt-1 text-[9px] text-zinc-500">
+                      Processo simples
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 py-4 sm:flex-col sm:items-start sm:border-l sm:border-zinc-200 sm:px-3 sm:py-5 sm:last:pr-0">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-zinc-500" />
+
+                  <div>
+                    <p className="text-[8px] font-bold uppercase tracking-[0.15em]">
+                      Compra segura
+                    </p>
+                    <p className="mt-1 text-[9px] text-zinc-500">
+                      Pagamento protegido
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* PRODUCT DETAILS */}
+
+              <div className="mt-2">
+                {[
+                  {
+                    title: "Detalhes e ajuste",
+                    content:
+                      "Criado para acompanhar o movimento do dia a dia. Consulta o guia de tamanhos para encontrares o ajuste ideal. As imagens do produto podem apresentar pequenas diferenças devido à iluminação e às definições do ecrã.",
+                  },
+                  {
+                    title: "Envios e devoluções",
+                    content:
+                      "Cada encomenda é cuidadosamente preparada antes do envio. Os prazos de entrega e as condições de devolução podem variar consoante a localização e o artigo adquirido.",
+                  },
+                  {
+                    title: "A filosofia Tanosi",
+                    content:
+                      "Não sigas o caminho só porque todos o seguem. Cria o teu próprio. Tanosi existe para quem prefere construir a sua identidade, desafiar expectativas e vestir aquilo que realmente sente.",
+                  },
+                ].map((item) => (
+                  <details
+                    key={item.title}
+                    className="group border-b border-zinc-200"
+                  >
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-[9px] font-bold uppercase tracking-[0.15em] marker:hidden sm:text-[10px]">
+                      <span>{item.title}</span>
+
+                      <Plus className="h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-300 group-open:rotate-45" />
+                    </summary>
+
+                    <div className="max-w-xl pb-5 pr-6 text-[11px] leading-6 text-zinc-500 sm:text-xs">
+                      {item.content}
+                    </div>
+                  </details>
+                ))}
+              </div>
 
               {/* BRAND SIGNATURE */}
 
