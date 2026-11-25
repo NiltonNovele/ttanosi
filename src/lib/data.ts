@@ -14,7 +14,7 @@ export const mockProducts: Product[] = [
   // MENS (6 items)
   {
     id: "p_01",
-    name: "",
+    name: "OVERSIZED WHY NOT T (BLACK)",
     description: "",
     price: 1799,
     category: "TANOSI",
@@ -24,7 +24,7 @@ export const mockProducts: Product[] = [
   },
   {
     id: "p_02",
-    name: "",
+    name: "OVERSIZED WHY NOT T (BLUE)",
     description: "",
     price: 1799,
     category: "TANOSI",
@@ -34,7 +34,7 @@ export const mockProducts: Product[] = [
   },
   {
     id: "p_11",
-    name: "",
+    name: "OVERSIZED WHY NOT T (WINE)",
     description: "",
     price: 1799,
     category: "TANOSI",
@@ -151,7 +151,7 @@ export const mockProducts: Product[] = [
   // ACCESSORIES (6 items)
   {
     id: "p_06",
-    name: "Black Fitted Cap",
+    name: "BLACK TRUCKER TANO HAT",
     description: "",
     price: 899,
     category: "accessories",
@@ -161,7 +161,7 @@ export const mockProducts: Product[] = [
   },
   {
     id: "p_07",
-    name: "Blue Fitted Cap",
+    name: "BLUE TRUCKER TANO HAT",
     description: "",
     price: 899,
     category: "accessories",
@@ -171,7 +171,7 @@ export const mockProducts: Product[] = [
   },
   {
     id: "p_23",
-    name: "Red Fitted Cap",
+    name: "RED TRUCKER TANO HAT",
     description: "",
     price: 899,
     category: "accessories",

@@ -4,7 +4,7 @@
 import React from "react";
 
 export function MovementMarquee() {
-  const text = "STAY WEIRD, MAKE ART, CONFUSE PEOPLE AND LET GOD DO THE REST.";
+  const text = "STAY WEIRD, MAKE ART & LET GOD DO THE REST";
   const repeatedText = Array(15)
     .fill(text)
     .join("                    ✦                    ");
