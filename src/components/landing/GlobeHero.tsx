@@ -119,7 +119,7 @@ interface GlobeHeroProps {
 }
 
 export function GlobeHero({
-  purchasesCount = 13,
+  purchasesCount = 6,
 }: GlobeHeroProps) {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [isPaused, setIsPaused] = React.useState(false);
@@ -229,20 +229,7 @@ export function GlobeHero({
       {/* Main hero */}
       <div className="mx-auto flex min-h-0 max-w-[1600px] flex-col px-4 pb-7 pt-5 sm:px-7 sm:pb-9 sm:pt-7 lg:min-h-[calc(100svh-36px)] lg:justify-center lg:px-12 lg:py-6 xl:px-16">
 
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between sm:mb-6 lg:mb-4">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-black" />
-
-            <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-500 sm:text-[9px]">
-              Colecção disponível para pré-encomenda
-            </span>
-          </div>
-
-          <span className="hidden text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 sm:block">
-            TANOSI — Stay Weird
-          </span>
-        </div>
+        
 
         {/* Main content */}
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-14">

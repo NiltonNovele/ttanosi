@@ -20,12 +20,12 @@ const navigation = [
     href: "/",
   },
   {
-    label: "Accessories",
-    href: "/collections/trending",
+    label: "Catálogo",
+    href: "/collections/all",
   },
   {
-    label: "LOOKBOOK",
-    href: "/collections/looks",
+    label: "Acessórios",
+    href: "/collections/accessories",
   },
 ];
 
