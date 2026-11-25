@@ -1,16 +1,35 @@
-
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function IntroScreen() {
   const [isVisible, setIsVisible] = React.useState(true);
+  const [isMobile, setIsMobile] = React.useState<boolean | null>(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
 
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
+  // Detectar se o dispositivo é um telemóvel
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    const updateDevice = () => {
+      setIsMobile(mediaQuery.matches);
+    };
+
+    updateDevice();
+
+    mediaQuery.addEventListener("change", updateDevice);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateDevice);
+    };
+  }, []);
+
+  // Iniciar o temporizador de 5 segundos
   const startIntroTimer = React.useCallback(() => {
     if (timerRef.current) return;
 
@@ -19,6 +38,19 @@ export function IntroScreen() {
     }, 5000);
   }, []);
 
+  // Quando o vídeo estiver pronto
+  const handleVideoReady = () => {
+    setIsLoaded(true);
+    startIntroTimer();
+  };
+
+  // Caso o vídeo não consiga carregar
+  const handleVideoError = () => {
+    setIsLoaded(true);
+    startIntroTimer();
+  };
+
+  // Limpar o temporizador
   React.useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -27,15 +59,9 @@ export function IntroScreen() {
     };
   }, []);
 
-  const handleImageLoad = () => {
-    setIsLoaded(true);
-    startIntroTimer();
-  };
-
-  const handleImageError = () => {
-    setIsLoaded(true);
-    startIntroTimer();
-  };
+  const videoSrc = isMobile
+    ? "/intro.mp4"
+    : "/intro-pc.mp4";
 
   return (
     <AnimatePresence>
@@ -53,24 +79,30 @@ export function IntroScreen() {
           aria-label="Introdução Tanosi"
           role="status"
         >
-          <Image
-            src="/intro.mp4"
-            alt="Tanosi — Introdução"
-            fill
-            priority
-            unoptimized
-            sizes="100vw"
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            className={`
-              object-cover
-              transition-opacity duration-500
-              ${isLoaded ? "opacity-100" : "opacity-0"}
-            `}
-          />
+          {/* Vídeo de introdução */}
+          {isMobile !== null && (
+            <video
+              key={videoSrc}
+              src={videoSrc}
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              onCanPlay={handleVideoReady}
+              onError={handleVideoError}
+              className={`
+                absolute inset-0
+                h-full w-full
+                object-cover
+                transition-opacity duration-500
+                ${isLoaded ? "opacity-100" : "opacity-0"}
+              `}
+            />
+          )}
 
+          {/* Ecrã de carregamento */}
           {!isLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center bg-black">
               <span className="text-sm font-black uppercase tracking-[0.35em] text-white">
                 TANOSI<span className="text-white/40">.</span>
               </span>

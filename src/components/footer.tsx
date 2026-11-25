@@ -18,7 +18,7 @@ const socialLinks = [
   },
   {
     label: "TikTok",
-    href: "https://tiktok.com/@YOUR_TIKTOK",
+    href: "https://www.tiktok.com/@ttanosi_?_r=1&_t=ZS-9BhvyXaf1e9",
     icon: Music2,
   },
   {
@@ -31,7 +31,7 @@ const socialLinks = [
 const footerLinks = [
   { label: "Home", href: "/" },
   { label: "Acessórios", href: "/collections/accessories" },
-  { label: "LookBook", href: "/collections/trending" },
+  { label: "LookBook", href: "/lookbook" },
 ];
 
 export function Footer() {
@@ -71,7 +71,7 @@ export function Footer() {
             </Link>
 
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-zinc-500">
-              Mantém-te estranho. Sê diferente.
+              Why not you?
             </p>
           </div>
 

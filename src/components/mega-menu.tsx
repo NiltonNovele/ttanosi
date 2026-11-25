@@ -174,7 +174,7 @@ export function MegaMenu() {
                   mt-1 text-[7px] font-bold uppercase
                   tracking-[0.32em] text-black/40
                 ">
-                  Fica Diferente
+                  Seja Diferente
                 </div>
               </div>
             </Link>
@@ -402,7 +402,7 @@ export function MegaMenu() {
                     text-[8px] uppercase
                     tracking-[0.2em] text-black/35
                   ">
-                    Fica Diferente ✦
+                    Seja Diferente ✦
                   </span>
                 </div>
               </div>

@@ -42,7 +42,7 @@ const capImages: LookbookItem[] = [
 const skulliesImages: LookbookItem[] = [
   { id: 1, src: "/lookbook/gorro/1.png", alt: "Gorro 1" },
   { id: 2, src: "/lookbook/gorro/2.png", alt: "Gorro 2" },
-  { id: 2, src: "/lookbook/gorro/2.png", alt: "Gorro 2" },
+  { id: 2, src: "/lookbook/gorro/3.png", alt: "Gorro 2" },
 ];
 
 const collections = [
