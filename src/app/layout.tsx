@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   applicationName: "Tanosi",
   generator: "Next.js",
 
-  metadataBase: new URL("https://Tanosi.vercel.app"),
+  metadataBase: new URL("https://Tanosi.store"),
 
   alternates: {
     canonical: "/",
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
     description:
       "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
 
-    url: "https://Tanosi.vercel.app",
+    url: "https://Tanosi.store",
 
     siteName: "Tanosi",
 
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
 
     images: [
       {
-        url: "/logo.jpg",
+        url: "/logo.png",
         width: 1200,
         height: 630,
         alt: "Tanosi — Feito para o Movimento",
@@ -115,13 +115,13 @@ export const metadata: Metadata = {
     description:
       "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
 
-    images: ["/logo.jpg"],
+    images: ["/logo.png"],
   },
 
   icons: {
-    icon: "/logo.jpg",
-    shortcut: "/logo.jpg",
-    apple: "/logo.jpg",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 
   robots: {
