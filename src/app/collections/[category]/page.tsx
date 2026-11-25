@@ -28,7 +28,6 @@ function formatCategoryTitle(category: string) {
     womens: "Mulher",
     trending: "Tendências",
     accessories: "Acessórios",
-    looks: "Visuais",
   };
 
   if (categoryNames[category]) {

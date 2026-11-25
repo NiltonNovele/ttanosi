@@ -13,100 +13,100 @@ import {
 const DATA = [
   {
     id: 0,
-    collection: "ARQUIVO ESSENCIAL",
+    collection: "TANOSI CORE",
     title: "T-SHIRT",
-    title2: "CORE",
+    title2: "ESSENTIAL",
     description:
-      "T-shirt de corte oversized em algodão premium, construída para um caimento descontraído e uma presença minimalista. Uma peça essencial para todos os dias.",
-    image: "/design/3.jpeg",
+      "A base de qualquer guarda-roupa. Uma T-shirt oversized em algodão premium, com uma silhueta descontraída, ombros descaídos e uma presença minimalista. Simples na forma. Forte na identidade.",
+    image: "/lookbook/shirt/2.png",
     tag: "01",
     type: "T-SHIRT",
   },
   {
     id: 1,
-    collection: "NOVA COLECÇÃO",
+    collection: "SIGNAL SERIES",
     title: "T-SHIRT",
     title2: "SIGNAL",
     description:
-      "Uma interpretação contemporânea da T-shirt clássica, com corte amplo, construção pesada e uma identidade gráfica criada para se destacar.",
-    image: "/women.jpeg",
+      "Uma peça que transforma o essencial numa declaração. Corte oversized, construção robusta e identidade gráfica marcante, criada para quem não precisa de seguir tendências para definir o seu estilo.",
+    image: "/lookbook/shirt/3.png",
     tag: "02",
     type: "T-SHIRT",
   },
   {
     id: 2,
-    collection: "ARQUIVO TANOSI",
-    title: "GORRO",
-    title2: "CORE",
+    collection: "TANOSI HEADWEAR",
+    title: "BONÉ",
+    title2: "Vermelho",
     description:
-      "Gorro de malha com construção confortável e estética limpa. Um essencial para completar qualquer combinação Tanosi.",
-    image: "/product/14.png",
+      "Um clássico reinterpretado. Boné de inspiração trucker, com painel frontal marcante e construção confortável. Um essencial de streetwear que acrescenta personalidade a qualquer combinação.",
+    image: "/lookbook/caps/7.jpg",
     tag: "03",
-    type: "GORRO",
+    type: "BONÉ",
   },
   {
     id: 3,
-    collection: "LIMITLESS",
-    title: "T-SHIRT",
-    title2: "ARCHIVE",
+    collection: "TANOSI HEADWEAR",
+    title: "BONÉ",
+    title2: "Azul",
     description:
-      "Silhueta oversized inspirada no arquivo Tanosi. Algodão de peso elevado, ombros descaídos e uma construção pensada para durar.",
-    image: "/product/11.png",
+      "Um clássico reinterpretado. Boné de inspiração trucker, com painel frontal marcante e construção confortável. Um essencial de streetwear que acrescenta personalidade a qualquer combinação.",
+    image: "/lookbook/caps/8.jpg",
     tag: "04",
     type: "T-SHIRT",
   },
   {
     id: 4,
-    collection: "HEADWEAR",
-    title: "FITTED",
-    title2: "01",
+    collection: "Archive",
+    title: "T-SHIRT",
+    title2: "Azul",
     description:
-      "Boné fitted de perfil estruturado, concebido para um ajuste preciso e uma presença discreta. O essencial elevado ao detalhe.",
-    image: "/product/17.png",
+      "Uma peça que transforma o essencial numa declaração. Corte oversized, construção robusta e identidade gráfica marcante, criada para quem não precisa de seguir tendências para definir o seu estilo.",
+    image: "/lookbook/shirt/4.png",
     tag: "05",
     type: "BONÉ FITTED",
   },
   {
     id: 5,
-    collection: "THE MOVEMENT",
+    collection: "MOVEMENT SERIES",
     title: "T-SHIRT",
     title2: "MOVEMENT",
     description:
-      "Uma T-shirt criada para representar o movimento. Corte relaxado, construção robusta e uma linguagem visual directamente ligada à identidade Tanosi.",
-    image: "/product/TANO7.png",
+      "Criada para acompanhar o movimento. Corte amplo, tecido de presença e uma linguagem visual que representa a energia da cultura urbana. Mais do que uma peça básica, uma expressão de identidade.",
+    image: "/lookbook/shirt/5.png",
     tag: "06",
     type: "T-SHIRT",
   },
   {
     id: 6,
-    collection: "HEADWEAR",
-    title: "GORRO",
+    collection: "TANOSI HEADWEAR",
+    title: "SKULLIE",
     title2: "ARCHIVE",
     description:
-      "Uma peça de headwear essencial com acabamento minimalista e construção confortável. Criada para acompanhar o ritmo da rua.",
-    image: "/product/15.png",
+      "Conforto essencial com uma atitude discreta. Um skullie de inspiração urbana, pensado para um ajuste confortável e uma estética simples que funciona em qualquer estação.",
+    image: "/lookbook/shirt/6.png",
     tag: "07",
-    type: "GORRO",
+    type: "SKULLIE",
   },
   {
     id: 7,
     collection: "FITTED SERIES",
-    title: "FITTED",
-    title2: "02",
+    title: "BONÉ",
+    title2: "FITTED 02",
     description:
-      "Boné fitted de construção estruturada com uma abordagem limpa e contemporânea. Um clássico reinterpretado pela Tanosi.",
-    image: "/product/cap1.png",
+      "Uma segunda interpretação da linha fitted. Construção estruturada, perfil definido e uma estética limpa que equilibra o carácter clássico do boné com a identidade Tanosi.",
+    image: "/lookbook/shirt/7.png",
     tag: "08",
     type: "BONÉ FITTED",
   },
   {
     id: 8,
-    collection: "CORE SERIES",
+    collection: "TANOSI CORE",
     title: "T-SHIRT",
     title2: "BLACK",
     description:
-      "A T-shirt essencial em preto. Silhueta ampla, presença forte e uma construção simples que deixa a identidade falar por si.",
-    image: "/design/4.jpeg",
+      "Preto. Sem excessos. Uma T-shirt oversized com uma silhueta descontraída e uma presença intemporal. Concebida para combinar com tudo e destacar-se sem precisar de chamar a atenção.",
+    image: "/lookbook/shirt/8.png",
     tag: "09",
     type: "T-SHIRT",
   },
@@ -208,7 +208,7 @@ export function GlobeHero({
 
   return (
     <section
-      className="relative w-full overflow-hidden bg-white text-black"
+      className="relative w-full overflow-hidden bg-white pt-20 text-black"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -228,8 +228,6 @@ export function GlobeHero({
 
       {/* Main hero */}
       <div className="mx-auto flex min-h-0 max-w-[1600px] flex-col px-4 pb-7 pt-5 sm:px-7 sm:pb-9 sm:pt-7 lg:min-h-[calc(100svh-36px)] lg:justify-center lg:px-12 lg:py-6 xl:px-16">
-
-        
 
         {/* Main content */}
         <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:gap-10 xl:grid-cols-[0.85fr_1.15fr] xl:gap-14">

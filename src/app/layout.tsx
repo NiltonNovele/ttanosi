@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import {
   Inter,
@@ -15,6 +16,7 @@ import { CartSidebar } from "@/components/cart-sidebar";
 import { Toaster } from "@/components/toaster";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Footer } from "@/components/footer";
+import { IntroScreen } from "@/components/intro-screen";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -153,6 +155,8 @@ export default function RootLayout({
           selection:text-primary-foreground
         `}
       >
+        <IntroScreen />
+
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -169,6 +173,7 @@ export default function RootLayout({
             <Toaster />
           </SmoothScroll>
         </ThemeProvider>
+
         <Footer />
       </body>
     </html>

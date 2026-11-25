@@ -6,14 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   CreditCard,
   Smartphone,
-  Truck,
   ChevronRight,
   ShieldCheck,
   MapPin,
   Lock,
   ShoppingBag,
   ArrowLeft,
-  Mail,
   User,
   Home,
   Check,
@@ -22,6 +20,9 @@ import {
   ArrowRight,
   X,
   ChevronLeft,
+  Phone,
+  Minus,
+  Receipt,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/useCartStore";
@@ -30,12 +31,9 @@ import { Footer } from "@/components/footer";
 
 /* ============================================================
    TYPES
-   ============================================================ */
+============================================================ */
 
-type PaymentMethodId =
-  | "cartao"
-  | "carteiras-moveis"
-  | "contra-entrega";
+type PaymentMethodId = "cartao" | "carteiras-moveis";
 
 type MobileStep = "dados" | "resumo";
 
@@ -52,18 +50,18 @@ type PaymentMethod = {
 type FormData = {
   firstName: string;
   lastName: string;
-  email: string;
+  phone: string;
   address: string;
 };
 
 /* ============================================================
    PAYMENT METHODS
-   ============================================================ */
+============================================================ */
 
 const paymentMethods: PaymentMethod[] = [
   {
     id: "cartao",
-    title: "Cartão",
+    title: "Cartão bancário",
     description: "Visa, Mastercard e outros cartões",
     icon: CreditCard,
     badge: "Online",
@@ -72,7 +70,6 @@ const paymentMethods: PaymentMethod[] = [
     images: [
       "/items/visa.png",
       "/items/mcard.png",
-      "/items/paypal.webp",
     ],
   },
   {
@@ -82,40 +79,31 @@ const paymentMethods: PaymentMethod[] = [
     icon: Smartphone,
     badge: "Moçambique",
     details:
-      "O pagamento será concluído numa página segura, onde poderá escolher entre M-Pesa, E-Mola ou mKesh.",
+      "Será redirecionado para uma página segura onde poderá selecionar uma das opções de pagamento móvel disponíveis.",
     images: [
       "/items/mpesa.jpeg",
       "/items/emola.png",
       "/items/mkesh.png",
     ],
   },
-  {
-    id: "contra-entrega",
-    title: "Pagamento na entrega",
-    description: "Pague quando receber a encomenda",
-    icon: Truck,
-    badge: "Disponível",
-    details:
-      "O pagamento será efetuado no momento da entrega, de acordo com as opções disponíveis.",
-  },
 ];
 
 /* ============================================================
    STYLES
-   ============================================================ */
+============================================================ */
 
 const inputClassName =
-  "w-full rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-sm text-black outline-none transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 focus:border-black focus:ring-4 focus:ring-black/[0.04]";
+  "w-full min-h-[52px] rounded-xl border border-zinc-200 bg-white px-4 py-3.5 text-sm text-black outline-none transition-all duration-200 placeholder:text-zinc-400 hover:border-zinc-300 focus:border-black focus:ring-4 focus:ring-black/[0.04] disabled:cursor-not-allowed disabled:bg-zinc-50";
 
 const labelClassName =
-  "flex items-center gap-2 px-1 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500";
+  "flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-500";
 
 const sectionClassName =
   "overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_8px_35px_rgba(0,0,0,0.035)]";
 
 /* ============================================================
    FORMATTERS
-   ============================================================ */
+============================================================ */
 
 const formatMZN = (value: number) =>
   `MZN ${value.toLocaleString("pt-PT", {
@@ -128,7 +116,7 @@ const getPaymentLabel = (id: PaymentMethodId) =>
 
 /* ============================================================
    REUSABLE COMPONENTS
-   ============================================================ */
+============================================================ */
 
 function SectionHeading({
   icon: Icon,
@@ -147,7 +135,7 @@ function SectionHeading({
         <Icon size={18} className="text-black" />
       </div>
 
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-sm font-black uppercase tracking-tight text-black sm:text-base">
             {title}
@@ -160,7 +148,7 @@ function SectionHeading({
           )}
         </div>
 
-        <p className="mt-1 text-[11px] text-zinc-500">
+        <p className="mt-1 text-[11px] leading-5 text-zinc-500">
           {description}
         </p>
       </div>
@@ -168,16 +156,18 @@ function SectionHeading({
   );
 }
 
+/* ============================================================
+   PAYMENT OPTIONS
+============================================================ */
+
 function PaymentOptions({
   selectedPayment,
   onSelect,
   disabled = false,
-  compact = false,
 }: {
   selectedPayment: PaymentMethodId;
   onSelect: (id: PaymentMethodId) => void;
   disabled?: boolean;
-  compact?: boolean;
 }) {
   return (
     <div className="space-y-3">
@@ -250,7 +240,7 @@ function PaymentOptions({
 
             {method.images && (
               <div className="ml-[58px] mt-3 flex flex-wrap items-center gap-2">
-                {method.images.slice(0, 3).map((image, index) => (
+                {method.images.map((image, index) => (
                   <div
                     key={`${method.id}-${index}`}
                     className="flex h-8 min-w-11 items-center justify-center overflow-hidden rounded-lg border border-zinc-200 bg-white px-2"
@@ -296,6 +286,10 @@ function PaymentOptions({
   );
 }
 
+/* ============================================================
+   ORDER ITEMS
+============================================================ */
+
 function OrderItems({
   items,
   compact = false,
@@ -310,7 +304,13 @@ function OrderItems({
   compact?: boolean;
 }) {
   return (
-    <div className={compact ? "space-y-4 p-5" : "max-h-[440px] space-y-5 overflow-y-auto p-7"}>
+    <div
+      className={
+        compact
+          ? "space-y-4 p-5"
+          : "max-h-[440px] space-y-5 overflow-y-auto p-7"
+      }
+    >
       {items.map((item) => (
         <div key={item.id} className="flex gap-3.5 sm:gap-4">
           <div
@@ -354,21 +354,29 @@ function OrderItems({
   );
 }
 
+/* ============================================================
+   ORDER TOTALS
+============================================================ */
+
 function OrderTotals({
   subtotal,
-  shipping,
   taxes,
   total,
   compact = false,
 }: {
   subtotal: number;
-  shipping: number;
   taxes: number;
   total: number;
   compact?: boolean;
 }) {
   return (
-    <div className={compact ? "border-t border-zinc-200 p-5" : "border-t border-zinc-200 px-7 py-7"}>
+    <div
+      className={
+        compact
+          ? "border-t border-zinc-200 p-5"
+          : "border-t border-zinc-200 px-7 py-7"
+      }
+    >
       <div className={`space-y-3 text-[11px] ${compact ? "" : "sm:text-sm"}`}>
         <div className="flex justify-between">
           <span className="text-zinc-500">Subtotal</span>
@@ -376,12 +384,13 @@ function OrderTotals({
         </div>
 
         <div className="flex justify-between">
-          <span className="text-zinc-500">Entrega</span>
-          <span className="text-zinc-800">{formatMZN(shipping)}</span>
-        </div>
+          <div>
+            <span className="text-zinc-500">Taxa</span>
+            <span className="ml-2 rounded-full bg-zinc-100 px-2 py-0.5 text-[8px] font-bold text-zinc-500">
+              6%
+            </span>
+          </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-500">Impostos</span>
           <span className="text-zinc-800">{formatMZN(taxes)}</span>
         </div>
       </div>
@@ -412,13 +421,114 @@ function OrderTotals({
 }
 
 /* ============================================================
+   CUSTOMER DETAILS FORM
+============================================================ */
+
+function CustomerFields({
+  formData,
+  onChange,
+  prefix,
+}: {
+  formData: FormData;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  prefix: string;
+}) {
+  return (
+    <div className="space-y-5 p-5 sm:p-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label htmlFor={`${prefix}-firstName`} className={labelClassName}>
+            <User size={11} />
+            Nome
+          </label>
+
+          <input
+            id={`${prefix}-firstName`}
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={onChange}
+            placeholder="O seu nome"
+            autoComplete="given-name"
+            className={inputClassName}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor={`${prefix}-lastName`} className={labelClassName}>
+            Apelido
+          </label>
+
+          <input
+            id={`${prefix}-lastName`}
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={onChange}
+            placeholder="O seu apelido"
+            autoComplete="family-name"
+            className={inputClassName}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor={`${prefix}-phone`} className={labelClassName}>
+          <Phone size={11} />
+          Número de telefone
+        </label>
+
+        <input
+          id={`${prefix}-phone`}
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={onChange}
+          placeholder="+258 84 000 0000"
+          autoComplete="tel"
+          inputMode="tel"
+          className={inputClassName}
+        />
+
+        <p className="px-1 text-[9px] leading-5 text-zinc-400">
+          Utilize um número válido para podermos contactá-lo sobre a sua encomenda.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor={`${prefix}-address`} className={labelClassName}>
+          <Home size={11} />
+          Morada de entrega
+        </label>
+
+        <input
+          id={`${prefix}-address`}
+          type="text"
+          name="address"
+          value={formData.address}
+          onChange={onChange}
+          placeholder="Rua, avenida, número e bairro..."
+          autoComplete="street-address"
+          className={inputClassName}
+        />
+
+        <p className="px-1 text-[9px] leading-5 text-zinc-400">
+          Indique uma morada completa para facilitar a entrega.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    MAIN COMPONENT
-   ============================================================ */
+============================================================ */
 
 export default function CheckoutPage() {
   const { items } = useCartStore();
 
   const [mounted, setMounted] = React.useState(false);
+
   const [mobileStep, setMobileStep] =
     React.useState<MobileStep>("dados");
 
@@ -433,7 +543,7 @@ export default function CheckoutPage() {
   const [formData, setFormData] = React.useState<FormData>({
     firstName: "",
     lastName: "",
-    email: "",
+    phone: "",
     address: "",
   });
 
@@ -451,7 +561,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      TOTALS
-     ============================================================ */
+  ============================================================ */
 
   const subtotal = React.useMemo(
     () =>
@@ -462,9 +572,11 @@ export default function CheckoutPage() {
     [items]
   );
 
-  const shipping = items.length > 0 ? 99 : 0;
-  const taxes = Math.round(subtotal * 0.05);
-  const total = subtotal + shipping + taxes;
+  // Taxa de 6% calculada sobre o subtotal dos produtos.
+  const taxes = Math.round(subtotal * 0.06);
+
+  // Não existe qualquer custo de entrega.
+  const total = subtotal + taxes;
 
   const totalItems = React.useMemo(
     () =>
@@ -477,7 +589,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      FORM
-     ============================================================ */
+  ============================================================ */
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -491,25 +603,44 @@ export default function CheckoutPage() {
   };
 
   const validateCustomerDetails = () => {
-    const fields = [
+    const requiredFields = [
       formData.firstName,
       formData.lastName,
-      formData.email,
+      formData.phone,
       formData.address,
     ];
 
-    if (fields.some((field) => !field.trim())) {
+    if (requiredFields.some((field) => !field.trim())) {
       toast.error("Informação em falta", {
         description:
-          "Preencha todos os dados de entrega antes de continuar.",
+          "Preencha todos os dados necessários para continuar.",
       });
 
       return false;
     }
 
-    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-      toast.error("E-mail inválido", {
-        description: "Introduza um endereço de e-mail válido.",
+    const normalizedPhone = formData.phone.replace(/[\s()-]/g, "");
+
+    if (!/^\+?\d{9,15}$/.test(normalizedPhone)) {
+      toast.error("Número de telefone inválido", {
+        description:
+          "Introduza um número de telefone válido, incluindo o indicativo se necessário.",
+      });
+
+      return false;
+    }
+
+    if (formData.firstName.trim().length < 2) {
+      toast.error("Nome inválido", {
+        description: "Introduza um nome válido.",
+      });
+
+      return false;
+    }
+
+    if (formData.lastName.trim().length < 2) {
+      toast.error("Apelido inválido", {
+        description: "Introduza um apelido válido.",
       });
 
       return false;
@@ -520,16 +651,19 @@ export default function CheckoutPage() {
 
   const handleMobileContinue = () => {
     if (!validateCustomerDetails()) return;
+
     setMobileStep("resumo");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleMobileBack = () => {
     setMobileStep("dados");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   /* ============================================================
      PAYMENT MODAL
-     ============================================================ */
+  ============================================================ */
 
   const openPaymentModal = () => {
     if (!validateCustomerDetails()) {
@@ -547,67 +681,67 @@ export default function CheckoutPage() {
 
   /* ============================================================
      PAYMENT
-     ============================================================ */
+  ============================================================ */
 
-  const continueToPayment = () => {
-    if (!selectedPayment) {
-      toast.error("Selecione um método de pagamento", {
-        description: "Escolha uma opção para continuar.",
+  const continueToPayment = async () => {
+    if (!validateCustomerDetails() || !items.length) return;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+
+    if (!apiUrl) {
+      toast.error("Configuração em falta", {
+        description:
+          "O serviço de pagamentos não está configurado. Contacte o suporte.",
       });
-
-      return;
-    }
-
-    if (!validateCustomerDetails()) {
-      setPaymentModalOpen(false);
-      setMobileStep("dados");
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const checkoutData = {
-        customer: {
-          firstName: formData.firstName.trim(),
-          lastName: formData.lastName.trim(),
-          email: formData.email.trim(),
-          address: formData.address.trim(),
+      const response = await fetch(`${apiUrl}/api/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        paymentMethod: selectedPayment,
-        paymentLabel: getPaymentLabel(selectedPayment),
-        items: items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-        })),
-        totals: {
-          subtotal,
-          shipping,
-          taxes,
-          total,
-        },
-        createdAt: new Date().toISOString(),
-      };
+        body: JSON.stringify({
+          customer: {
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim(),
+            phone: formData.phone.trim(),
+            address: formData.address.trim(),
+          },
+          paymentMethod: selectedPayment,
+          items: items.map((item) => ({
+            id: String(item.id),
+            quantity: Number(item.quantity),
+          })),
+        }),
+      });
 
-      sessionStorage.setItem(
-        "ttanosi_checkout",
-        JSON.stringify(checkoutData)
-      );
+      const result = await response.json();
 
-      window.setTimeout(() => {
-        window.location.assign(
-          `/pagamento?metodo=${encodeURIComponent(selectedPayment)}`
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Não foi possível iniciar o pagamento."
         );
-      }, 150);
-    } catch (error) {
-      console.error("Erro ao preparar checkout:", error);
+      }
 
-      toast.error("Não foi possível continuar", {
+      if (!result.checkoutUrl) {
+        throw new Error(
+          "O serviço de pagamentos não devolveu um endereço válido."
+        );
+      }
+
+      window.location.assign(result.checkoutUrl);
+    } catch (error) {
+      console.error("Checkout error:", error);
+
+      toast.error("Não foi possível iniciar o pagamento", {
         description:
-          "Ocorreu um problema ao preparar o pagamento. Tente novamente.",
+          error instanceof Error
+            ? error.message
+            : "Ocorreu um erro inesperado. Tente novamente.",
       });
 
       setIsProcessing(false);
@@ -616,7 +750,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      LOADING
-     ============================================================ */
+  ============================================================ */
 
   if (!mounted) {
     return (
@@ -636,62 +770,65 @@ export default function CheckoutPage() {
 
   /* ============================================================
      EMPTY CART
-     ============================================================ */
+  ============================================================ */
 
   if (items.length === 0) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-5 py-24 text-black sm:px-6">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/4 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-zinc-100 blur-3xl" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="relative w-full max-w-xl text-center"
-        >
-          <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50">
-            <ShoppingBag
-              size={38}
-              strokeWidth={1.4}
-              className="text-zinc-400"
-            />
+      <>
+        <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-white px-5 py-24 text-black sm:px-6">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute left-1/2 top-1/4 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-zinc-100 blur-3xl" />
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-300 to-transparent" />
           </div>
 
-          <p className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-400">
-            Checkout / Carrinho vazio
-          </p>
-
-          <h1 className="text-[clamp(2.5rem,8vw,4.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-black">
-            Nada por aqui.
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-md text-sm leading-7 text-zinc-500">
-            O seu carrinho está vazio. Explore as últimas
-            peças da Tanosi e encontre algo que represente o
-            seu movimento.
-          </p>
-
-          <Link
-            href="/collections"
-            className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-7 py-3.5 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all duration-300 hover:scale-[1.03] hover:bg-zinc-800 active:scale-[0.98]"
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="relative w-full max-w-xl text-center"
           >
-            Começar a comprar
-            <ChevronRight size={15} />
-          </Link>
-        </motion.div>
-      </main>
+            <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50">
+              <ShoppingBag
+                size={38}
+                strokeWidth={1.4}
+                className="text-zinc-400"
+              />
+            </div>
+
+            <p className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.35em] text-zinc-400">
+              Checkout / Carrinho vazio
+            </p>
+
+            <h1 className="text-[clamp(2.5rem,8vw,4.5rem)] font-black uppercase leading-[0.9] tracking-[-0.06em] text-black">
+              Nada por aqui.
+            </h1>
+
+            <p className="mx-auto mt-5 max-w-md text-sm leading-7 text-zinc-500">
+              O seu carrinho está vazio. Explore as últimas peças da Tanosi
+              e encontre algo que represente o seu movimento.
+            </p>
+
+            <Link
+              href="/collections"
+              className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-7 py-3.5 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all duration-300 hover:scale-[1.03] hover:bg-zinc-800 active:scale-[0.98]"
+            >
+              Começar a comprar
+              <ChevronRight size={15} />
+            </Link>
+          </motion.div>
+        </main>
+
+        <Footer />
+      </>
     );
   }
 
   /* ============================================================
      PAYMENT MODAL
-     ============================================================ */
+  ============================================================ */
 
   const renderPaymentModal = () => (
     <AnimatePresence>
@@ -758,7 +895,6 @@ export default function CheckoutPage() {
                 selectedPayment={selectedPayment}
                 onSelect={setSelectedPayment}
                 disabled={isProcessing}
-                compact
               />
             </div>
 
@@ -811,7 +947,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      MOBILE CHECKOUT
-     ============================================================ */
+  ============================================================ */
 
   const renderMobileCheckout = () => {
     const isDetailsStep = mobileStep === "dados";
@@ -860,8 +996,8 @@ export default function CheckoutPage() {
 
           <p className="mt-4 max-w-sm text-[12px] leading-6 text-zinc-500">
             {isDetailsStep
-              ? "Introduza os seus dados para prepararmos a entrega."
-              : "Confirme a sua encomenda antes de escolher o método de pagamento."}
+              ? "Introduza os seus dados para prepararmos a sua encomenda."
+              : "Confira os artigos e os valores antes de avançar para o pagamento."}
           </p>
         </div>
 
@@ -916,78 +1052,11 @@ export default function CheckoutPage() {
                   number="01"
                 />
 
-                <div className="space-y-5 p-5 sm:p-6">
-                  <div className="space-y-2">
-                    <label htmlFor="mobile-firstName" className={labelClassName}>
-                      <User size={11} />
-                      Nome
-                    </label>
-
-                    <input
-                      id="mobile-firstName"
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      placeholder="João"
-                      autoComplete="given-name"
-                      className={inputClassName}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="mobile-lastName" className={labelClassName}>
-                      Apelido
-                    </label>
-
-                    <input
-                      id="mobile-lastName"
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Manuel"
-                      autoComplete="family-name"
-                      className={inputClassName}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="mobile-email" className={labelClassName}>
-                      <Mail size={11} />
-                      E-mail
-                    </label>
-
-                    <input
-                      id="mobile-email"
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="joao@exemplo.com"
-                      autoComplete="email"
-                      className={inputClassName}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="mobile-address" className={labelClassName}>
-                      <Home size={11} />
-                      Morada
-                    </label>
-
-                    <input
-                      id="mobile-address"
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      placeholder="Rua, avenida, número..."
-                      autoComplete="street-address"
-                      className={inputClassName}
-                    />
-                  </div>
-                </div>
+                <CustomerFields
+                  formData={formData}
+                  onChange={handleInputChange}
+                  prefix="mobile"
+                />
               </section>
 
               <button
@@ -1031,7 +1100,6 @@ export default function CheckoutPage() {
 
                 <OrderTotals
                   subtotal={subtotal}
-                  shipping={shipping}
                   taxes={taxes}
                   total={total}
                   compact
@@ -1042,7 +1110,7 @@ export default function CheckoutPage() {
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="min-w-0">
                     <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                      Entrega
+                      Dados de entrega
                     </p>
 
                     <h3 className="mt-1 truncate text-[12px] font-black uppercase text-black">
@@ -1059,16 +1127,48 @@ export default function CheckoutPage() {
                   </button>
                 </div>
 
-                <div className="space-y-1 text-[10px] leading-5 text-zinc-500">
-                  <p>{formData.address}</p>
-                  <p className="break-all">{formData.email}</p>
+                <div className="space-y-2 text-[10px] leading-5 text-zinc-500">
+                  <p className="flex items-start gap-2">
+                    <Phone size={12} className="mt-1 shrink-0" />
+                    {formData.phone}
+                  </p>
+
+                  <p className="flex items-start gap-2">
+                    <Home size={12} className="mt-1 shrink-0" />
+                    <span>{formData.address}</span>
+                  </p>
                 </div>
               </section>
+
+              <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-50">
+                    <Receipt size={16} />
+                  </div>
+
+                  <div>
+                    <h3 className="text-[10px] font-black uppercase tracking-wide text-black">
+                      Resumo de pagamento
+                    </h3>
+                    <p className="mt-1 text-[9px] text-zinc-500">
+                      Escolha o método no próximo passo.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-zinc-500">Total a pagar</span>
+                  <span className="text-sm font-black text-black">
+                    {formatMZN(total)}
+                  </span>
+                </div>
+              </div>
 
               <button
                 type="button"
                 onClick={openPaymentModal}
-                className="group mt-4 flex min-h-[60px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985]"
+                disabled={isProcessing}
+                className="group mt-4 flex min-h-[60px] w-full items-center justify-center gap-3 rounded-xl bg-black px-5 py-4 text-[10px] font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-zinc-800 active:scale-[0.985] disabled:opacity-50"
               >
                 Pagar agora
                 <ArrowRight
@@ -1090,9 +1190,8 @@ export default function CheckoutPage() {
                 <Lock size={11} className="mt-0.5 shrink-0" />
 
                 <p>
-                  Os seus dados são utilizados apenas para processar a
-                  encomenda. Depois de escolher o método, será redirecionado
-                  para a página de pagamento.
+                  Os seus dados são utilizados para processar a encomenda.
+                  O pagamento será realizado numa página segura.
                 </p>
               </div>
             </motion.div>
@@ -1129,7 +1228,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      DESKTOP CHECKOUT
-     ============================================================ */
+  ============================================================ */
 
   const renderDesktopCheckout = () => (
     <div className="hidden lg:block">
@@ -1190,80 +1289,11 @@ export default function CheckoutPage() {
               number="01"
             />
 
-            <div className="space-y-6 p-7">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label htmlFor="desktop-firstName" className={labelClassName}>
-                    <User size={11} />
-                    Nome
-                  </label>
-
-                  <input
-                    id="desktop-firstName"
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    placeholder="João"
-                    autoComplete="given-name"
-                    className={inputClassName}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="desktop-lastName" className={labelClassName}>
-                    Apelido
-                  </label>
-
-                  <input
-                    id="desktop-lastName"
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    placeholder="Manuel"
-                    autoComplete="family-name"
-                    className={inputClassName}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="desktop-email" className={labelClassName}>
-                  <Mail size={11} />
-                  Endereço de e-mail
-                </label>
-
-                <input
-                  id="desktop-email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="joao@exemplo.com"
-                  autoComplete="email"
-                  className={inputClassName}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="desktop-address" className={labelClassName}>
-                  <Home size={11} />
-                  Morada
-                </label>
-
-                <input
-                  id="desktop-address"
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  placeholder="Rua, avenida, número e complemento"
-                  autoComplete="street-address"
-                  className={inputClassName}
-                />
-              </div>
-            </div>
+            <CustomerFields
+              formData={formData}
+              onChange={handleInputChange}
+              prefix="desktop"
+            />
           </section>
 
           <section className={sectionClassName}>
@@ -1278,6 +1308,7 @@ export default function CheckoutPage() {
               <PaymentOptions
                 selectedPayment={selectedPayment}
                 onSelect={setSelectedPayment}
+                disabled={isProcessing}
               />
             </div>
           </section>
@@ -1347,7 +1378,6 @@ export default function CheckoutPage() {
 
               <OrderTotals
                 subtotal={subtotal}
-                shipping={shipping}
                 taxes={taxes}
                 total={total}
               />
@@ -1403,8 +1433,8 @@ export default function CheckoutPage() {
                   <Lock size={11} className="mt-0.5 shrink-0" />
 
                   <p>
-                    Os seus dados são utilizados apenas para processar a
-                    encomenda. O pagamento será concluído na página seguinte.
+                    Os seus dados são utilizados para processar a encomenda.
+                    O pagamento será concluído numa página segura.
                   </p>
                 </div>
               </div>
@@ -1422,7 +1452,7 @@ export default function CheckoutPage() {
 
   /* ============================================================
      PAGE
-     ============================================================ */
+  ============================================================ */
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#fafafa] text-black">

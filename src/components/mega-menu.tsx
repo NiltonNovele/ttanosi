@@ -27,6 +27,10 @@ const navigation = [
     label: "Acessórios",
     href: "/collections/accessories",
   },
+  {
+    label: "LookBook",
+    href: "/lookbook",
+  },
 ];
 
 export function MegaMenu() {
@@ -133,7 +137,7 @@ export function MegaMenu() {
               href="/"
               onClick={closeMobileMenu}
               className="group flex items-center gap-2.5"
-              aria-label="Página inicial da Ttanosi"
+              aria-label="Página inicial da Tanosi"
             >
               <div className="
                 relative h-10 w-12 shrink-0
@@ -143,7 +147,7 @@ export function MegaMenu() {
               ">
                 <Image
                   src="/logo.png"
-                  alt="Ttanosi"
+                  alt="Tanosi"
                   fill
                   priority
                   sizes="48px"
@@ -224,7 +228,6 @@ export function MegaMenu() {
 
           {/* RIGHT: SHOPPING CART */}
           <div className="flex items-center gap-1">
-
             <button
               type="button"
               onClick={toggleCart}
@@ -341,7 +344,6 @@ export function MegaMenu() {
                         `}
                       >
                         <div className="flex items-center gap-4">
-
                           <span className={`
                             font-mono text-[9px]
                             ${
@@ -389,7 +391,6 @@ export function MegaMenu() {
                 px-5 py-4
               ">
                 <div className="flex items-center justify-between">
-
                   <span className="
                     text-[8px] font-bold uppercase
                     tracking-[0.25em] text-black/40
@@ -408,7 +409,6 @@ export function MegaMenu() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </header>
   );
