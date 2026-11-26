@@ -1,12 +1,5 @@
 
 import type { Metadata } from "next";
-import {
-  Inter,
-  Space_Grotesk,
-  Montserrat,
-  Roboto,
-  Oswald,
-} from "next/font/google";
 
 import "./globals.css";
 
@@ -17,34 +10,6 @@ import { Toaster } from "@/components/toaster";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { Footer } from "@/components/footer";
 import { IntroScreen } from "@/components/intro-screen";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-});
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  weight: ["300", "600", "900"],
-});
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["300", "400"],
-});
-
-const oswald = Oswald({
-  variable: "--font-oswald",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -68,18 +33,13 @@ export const metadata: Metadata = {
     "acessórios",
   ],
 
-  authors: [
-    {
-      name: "Tanosi",
-    },
-  ],
-
+  authors: [{ name: "Tanosi" }],
   creator: "Tanosi",
   publisher: "Tanosi",
   applicationName: "Tanosi",
   generator: "Next.js",
 
-  metadataBase: new URL("https://Tanosi.store"),
+  metadataBase: new URL("https://www.tanosi.store"),
 
   alternates: {
     canonical: "/",
@@ -87,18 +47,12 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Tanosi — Feito para o Movimento",
-
     description:
       "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
-
-    url: "https://Tanosi.store",
-
+    url: "https://www.tanosi.store",
     siteName: "Tanosi",
-
     type: "website",
-
     locale: "pt_PT",
-
     images: [
       {
         url: "/logo.png",
@@ -111,12 +65,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-
     title: "Tanosi — Feito para o Movimento",
-
     description:
       "Streetwear marcante. Lançamentos limitados. Feito para o movimento.",
-
     images: ["/logo.png"],
   },
 
@@ -140,12 +91,7 @@ export default function RootLayout({
   return (
     <html lang="pt-PT" suppressHydrationWarning>
       <body
-        className={`
-          ${inter.variable}
-          ${spaceGrotesk.variable}
-          ${montserrat.variable}
-          ${roboto.variable}
-          ${oswald.variable}
+        className="
           min-h-screen
           flex
           flex-col
@@ -153,7 +99,7 @@ export default function RootLayout({
           antialiased
           selection:bg-primary
           selection:text-primary-foreground
-        `}
+        "
       >
         <IntroScreen />
 
