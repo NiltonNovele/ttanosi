@@ -601,7 +601,7 @@ export default function CheckoutPage() {
 
     if (!validateCustomerDetails() || !items.length) return;
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+    const apiUrl = "https://5d79-41-220-200-101.ngrok-free.app/api/checkout";
 
     if (!apiUrl) {
       toast.error("Configuração em falta", {
@@ -707,7 +707,7 @@ if (invalidItem) {
     setIsProcessing(true);
 
     try {
-      const response = await fetch(`${apiUrl}/api/checkout`, {
+      const response = await fetch(`https://5d79-41-220-200-101.ngrok-free.app/api/checkout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
