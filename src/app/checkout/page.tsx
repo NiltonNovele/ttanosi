@@ -596,154 +596,178 @@ export default function CheckoutPage() {
      PAYMENT
   ============================================================ */
 
-  const continueToPayment = async () => {
-    if (isProcessing) return;
+  
+const continueToPayment = async () => {
+  if (isProcessing) return;
 
-    if (!validateCustomerDetails() || !items.length) return;
+  if (!validateCustomerDetails() || !items.length) return;
 
-    const apiUrl = "https://5d79-41-220-200-101.ngrok-free.app/api/checkout";
+  const API_URL ="https://5d79-41-220-200-101.ngrok-free.app";
 
-    if (!apiUrl) {
-      toast.error("Configuração em falta", {
-        description:
-          "O serviço de pagamentos não está configurado. Contacte o suporte.",
-      });
-      return;
-    }
+  if (!API_URL) {
+    toast.error("Configuração em falta", {
+      description:
+        "O serviço de pagamentos não está configurado. Contacte o suporte.",
+    });
+    return;
+  }
 
-    const checkoutItems: CheckoutItem[] = items.map((item: any) => ({
-  id: String(
-    item.id ??
-    item._id ??
-    item.productId ??
-    ""
-  ).trim(),
+  const checkoutItems: CheckoutItem[] = items.map((item: any) => ({
+    id: String(
+      item.id ??
+      item._id ??
+      item.productId ??
+      ""
+    ).trim(),
 
-  name: String(item.name ?? "").trim(),
+    name: String(item.name ?? "").trim(),
+    price: Number(item.price),
+    image: item.image ? String(item.image) : null,
+    quantity: Number(item.quantity ?? item.qty),
+  }));
 
-  price: Number(item.price),
-
-  image: item.image ? String(item.image) : null,
-
-  quantity: Number(item.quantity ?? item.qty),
-}));
-
-    const invalidItem = checkoutItems.find(
-  (item) =>
-    !item.id ||
-    !item.name ||
-    !Number.isFinite(item.price) ||
-    item.price < 0 ||
-    !Number.isInteger(item.quantity) ||
-    item.quantity < 1
-);
-
-if (invalidItem) {
-  console.error("========== TANOSI CHECKOUT DEBUG ==========");
-
-  console.log("Artigos originais do carrinho:", items);
-
-  console.table(
-    items.map((item: any, index: number) => ({
-      index,
-      id: item.id,
-      _id: item._id,
-      productId: item.productId,
-      name: item.name,
-      price: item.price,
-      priceType: typeof item.price,
-      quantity: item.quantity,
-      qty: item.qty,
-    }))
+  const invalidItem = checkoutItems.find(
+    (item) =>
+      !item.id ||
+      !item.name ||
+      !Number.isFinite(item.price) ||
+      item.price < 0 ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1
   );
 
-  console.error("Artigos preparados para checkout:", checkoutItems);
-  console.error("Artigo inválido:", invalidItem);
+  if (invalidItem) {
+    console.error("========== TANOSI CHECKOUT DEBUG ==========");
+    console.log("Artigos originais do carrinho:", items);
+    console.error("Artigos preparados para checkout:", checkoutItems);
+    console.error("Artigo inválido:", invalidItem);
+    console.error("===========================================");
 
-  console.error("===========================================");
+    toast.error("Dados dos produtos inválidos", {
+      description:
+        "Um ou mais artigos não têm informação válida. Consulte a consola para identificar o problema.",
+    });
 
-  toast.error("Dados dos produtos inválidos", {
-    description:
-      "Um ou mais artigos não têm informação válida. Consulte a consola para identificar o problema.",
-  });
+    return;
+  }
 
-  return;
-}
+  const customer = {
+    firstName: formData.firstName.trim(),
+    lastName: formData.lastName.trim(),
+    phone: formData.phone.trim(),
+    address: formData.address.trim(),
+  };
 
-    const checkoutPayload = {
+  const checkoutPayload = {
+    customer,
+    paymentMethod: "carteiras-moveis",
+    paymentMethods: [
+      "mpesa",
+      "emola",
+      "mkesh",
+      "credit_card",
+      "reference",
+    ],
+    currency: "MZN",
+    items: checkoutItems,
+  };
+
+  setIsProcessing(true);
+
+  try {
+    const response = await fetch(`https://5d79-41-220-200-101.ngrok-free.app/api/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(checkoutPayload),
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        result.error || "Não foi possível iniciar o pagamento."
+      );
+    }
+
+    if (!result.checkoutUrl) {
+      throw new Error(
+        "O backend não devolveu um endereço de pagamento válido."
+      );
+    }
+
+    // Generate the receipt information from the actual checkout form.
+    const subtotal = checkoutItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    const reference =
+      result.reference ||
+      result.orderReference ||
+      result.order?.reference ||
+      `TNS-${Date.now()}`;
+
+    const pendingReceipt = {
+      status: "paid",
+      reference: String(reference),
+      receiptNumber:
+        result.receiptNumber ||
+        result.order?.receiptNumber ||
+        `TNS-${String(reference)}`,
+      createdAt: new Date().toISOString(),
+
       customer: {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        phone: formData.phone.trim(),
-        address: formData.address.trim(),
+        name: `${customer.firstName} ${customer.lastName}`,
+        phone: customer.phone,
+        address: customer.address,
       },
 
-      /*
-       * Mantido para compatibilidade com o backend actual.
-       * O backend deve interpretar este valor como ausência
-       * de restrição de método de pagamento.
-       */
-      paymentMethod: "carteiras-moveis",
+      items: checkoutItems.map((item) => ({
+        productId: item.id,
+        name: item.name,
+        image: item.image || null,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        lineTotal: item.price * item.quantity,
+      })),
 
-      /*
-       * Lista informativa dos métodos pretendidos.
-       * A PaySuite só disponibiliza os métodos activados
-       * na conta comercial Tanosi.
-       */
-      paymentMethods: [
-    "mpesa",
-    "emola",
-    "mkesh",
-    "credit_card",
-    "reference",
-  ],
+      subtotal,
+      tax: 0,
+      taxRate: 0,
+      total: subtotal,
 
-      currency: "MZN",
-
-      // Os preços enviados são os preços originais dos artigos.
-      items: checkoutItems,
+      paymentMethod: "PaySuite",
+      transactionId:
+        result.transactionId ||
+        result.transaction?.id ||
+        null,
     };
 
-    setIsProcessing(true);
+    // Save the receipt before redirecting to the payment provider.
+    sessionStorage.setItem(
+      "tanosi_pending_receipt",
+      JSON.stringify(pendingReceipt)
+    );
 
-    try {
-      const response = await fetch(`https://5d79-41-220-200-101.ngrok-free.app/api/checkout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(checkoutPayload),
-      });
+    // Redirect only after the receipt information has been saved.
+    window.location.assign(result.checkoutUrl);
 
-      const result = await response.json().catch(() => ({}));
+  } catch (error) {
+    console.error("Checkout error:", error);
 
-      if (!response.ok) {
-        throw new Error(
-          result.error || "Não foi possível iniciar o pagamento."
-        );
-      }
+    toast.error("Não foi possível iniciar o pagamento", {
+      description:
+        error instanceof Error
+          ? error.message
+          : "Ocorreu um erro inesperado. Tente novamente.",
+    });
 
-      if (!result.checkoutUrl) {
-        throw new Error(
-          "O backend não devolveu um endereço de pagamento válido."
-        );
-      }
-
-      window.location.assign(result.checkoutUrl);
-    } catch (error) {
-      console.error("Checkout error:", error);
-
-      toast.error("Não foi possível iniciar o pagamento", {
-        description:
-          error instanceof Error
-            ? error.message
-            : "Ocorreu um erro inesperado. Tente novamente.",
-      });
-
-      setIsProcessing(false);
-    }
-  };
+    setIsProcessing(false);
+  }
+};
 
   /* ============================================================
      LOADING
