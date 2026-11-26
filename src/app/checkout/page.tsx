@@ -602,7 +602,7 @@ const continueToPayment = async () => {
 
   if (!validateCustomerDetails() || !items.length) return;
 
-  const API_URL ="https://5d79-41-220-200-101.ngrok-free.app";
+  const API_URL ="https://tanosi-backend-production.up.railway.app"; //"https://5d79-41-220-200-101.ngrok-free.app"
 
   if (!API_URL) {
     toast.error("Configuração em falta", {
@@ -675,7 +675,7 @@ const continueToPayment = async () => {
   setIsProcessing(true);
 
   try {
-    const response = await fetch(`https://5d79-41-220-200-101.ngrok-free.app/api/checkout`, {
+    const response = await fetch(`https://tanosi-backend-production.up.railway.app/api/checkout`, { //https://5d79-41-220-200-101.ngrok-free.app/api/checkout
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -966,6 +966,7 @@ app.post("/api/checkout", async (req, res) => {
     });
   } catch (error) {
     console.error("Checkout error:", error);
+    console.error("Cause:", error.cause);
 
     if (
       createdOrder &&
