@@ -68,6 +68,67 @@ app.set("trust proxy", 1);
  * Mantém esta configuração antes das rotas.
  */
 
+
+/* ============================================================
+   CORS CONFIGURATION
+============================================================ */
+
+const ALLOWED_ORIGINS = new Set(
+  [
+    // Local development
+    "http://localhost:3000",
+
+    // Tanosi production domains
+    "https://www.tanosi.store",
+    "https://tanosi.store",
+
+    // Vercel deployment domains
+    "https://ttanosi.vercel.app",
+    "https://www.ttanosi.vercel.app",
+
+    // Primary frontend URL from Render environment
+    ...FRONTEND_URL.split(","),
+
+    // Additional origins from Render environment
+    ...(process.env.CORS_ORIGINS || "").split(","),
+  ]
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean)
+);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests without an Origin header (e.g. server-to-server).
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/+$/, "");
+
+    if (ALLOWED_ORIGINS.has(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    console.warn("CORS blocked origin:", origin);
+    return callback(null, false);
+  },
+
+  methods: ["GET", "POST", "PATCH", "OPTIONS"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Accept",
+    "Authorization",
+    "X-Admin-Key",
+  ],
+
+  optionsSuccessStatus: 204,
+  maxAge: 86400,
+};
+
+// CORS must run before the routes and JSON parser.
+app.use(cors(corsOptions));
+
 app.use(
   express.json({
     limit: "100kb",
@@ -77,13 +138,6 @@ app.use(
   })
 );
 
-app.use(
-  cors({
-    origin: FRONTEND_URL.split(",").map((url) => url.trim()),
-    methods: ["GET", "POST", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "X-Admin-Key"],
-  })
-);
 
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
